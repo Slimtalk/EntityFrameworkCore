@@ -45,10 +45,6 @@ namespace Microsoft.EntityFrameworkCore.Query.ExpressionTranslators
             _methodCallTranslators
                 = new List<IMethodCallTranslator>
                 {
-                    new EnumHasFlagTranslator(),
-                    new GetValueOrDefaultTranslator(),
-                    new IsNullOrEmptyTranslator(),
-                    new LikeTranslator()
                 };
         }
 

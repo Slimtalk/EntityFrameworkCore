@@ -104,7 +104,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
 
             if (inferredTypeMapping == null)
             {
-                throw new InvalidOperationException("TypeMapping should not be null.");
+                return caseExpression;
             }
 
             var whenClauses = new List<CaseWhenClause>();
@@ -225,7 +225,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
         protected virtual SqlExpression ApplyTypeMappingOnSqlFunction(
             SqlFunctionExpression sqlFunctionExpression, RelationalTypeMapping typeMapping)
         {
-            return sqlFunctionExpression;
+            return sqlFunctionExpression.ApplyTypeMapping(typeMapping);
         }
 
         protected virtual SqlExpression ApplyTypeMappingOnLike(

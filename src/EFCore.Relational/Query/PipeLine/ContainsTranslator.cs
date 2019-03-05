@@ -53,7 +53,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
                 var source = instance;
                 var item = arguments[0];
 
-                var typeMapping = ExpressionExtensions.InferTypeMapping(source, item);
+                var typeMapping = ExpressionExtensions.InferTypeMapping(source, item) ?? _typeMappingSource.FindMapping(item.Type);
 
                 source = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(source, typeMapping);
                 item = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(item, typeMapping);

@@ -138,6 +138,20 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
                 : this;
         }
 
+        public SqlFunctionExpression ApplyTypeMapping(RelationalTypeMapping typeMapping)
+        {
+            return new SqlFunctionExpression(
+                Instance,
+                Schema,
+                FunctionName,
+                IsNiladic,
+                Arguments,
+                Type,
+                typeMapping ?? TypeMapping,
+                IsCondition,
+                ShouldBeValue);
+        }
+
         public override SqlExpression ConvertToValue(bool treatAsValue)
         {
             return new SqlFunctionExpression(

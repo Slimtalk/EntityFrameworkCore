@@ -3,12 +3,13 @@
 
 using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions;
 
 namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
 {
     public interface IMethodCallTranslatorProvider
     {
-        SqlExpression Translate(SqlExpression instance, MethodInfo method, IList<SqlExpression> arguments);
+        SqlExpression Translate(IModel model, SqlExpression instance, MethodInfo method, IList<SqlExpression> arguments);
     }
 }

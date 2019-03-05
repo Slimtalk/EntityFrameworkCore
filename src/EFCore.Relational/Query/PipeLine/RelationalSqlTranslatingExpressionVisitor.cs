@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Extensions.Internal;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Query.Pipeline;
 using Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -15,6 +16,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
 {
     public class RelationalSqlTranslatingExpressionVisitor : ExpressionVisitor
     {
+        private readonly IModel _model;
         private readonly IRelationalTypeMappingSource _typeMappingSource;
         private readonly ITypeMappingApplyingExpressionVisitor _typeMappingApplyingExpressionVisitor;
         private readonly IMemberTranslatorProvider _memberTranslatorProvider;
@@ -23,11 +25,13 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
         private SelectExpression _selectExpression;
 
         public RelationalSqlTranslatingExpressionVisitor(
+            IModel model,
             IRelationalTypeMappingSource typeMappingSource,
             ITypeMappingApplyingExpressionVisitor typeMappingApplyingExpressionVisitor,
             IMemberTranslatorProvider memberTranslatorProvider,
             IMethodCallTranslatorProvider methodCallTranslatorProvider)
         {
+            _model = model;
             _typeMappingSource = typeMappingSource;
             _typeMappingApplyingExpressionVisitor = typeMappingApplyingExpressionVisitor;
             _memberTranslatorProvider = memberTranslatorProvider;
@@ -93,7 +97,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
             return failed
                 ? null
                 : _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                    _methodCallTranslatorProvider.Translate(@object, methodCallExpression.Method, arguments),
+                    _methodCallTranslatorProvider.Translate(_model, @object, methodCallExpression.Method, arguments),
                     null);
         }
 
@@ -119,7 +123,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
                     || _stringConcatStringMethodInfo.Equals(binaryExpression.Method)))
             {
                 return _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                    _methodCallTranslatorProvider.Translate(null, binaryExpression.Method, new[] { left, right }), null);
+                    _methodCallTranslatorProvider.Translate(_model, null, binaryExpression.Method, new[] { left, right }), null);
             }
 
             var newExpression = new SqlBinaryExpression(
@@ -225,8 +229,9 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
             if (unaryExpression.NodeType == ExpressionType.Convert)
             {
                 if (operand.Type.IsInterface
-                    && unaryExpression.Type.GetInterfaces().Any(e => e == operand.Type)
-                    || unaryExpression.Type.UnwrapNullableType() == operand.Type)
+                        && unaryExpression.Type.GetInterfaces().Any(e => e == operand.Type)
+                    || unaryExpression.Type.UnwrapNullableType() == operand.Type
+                    || unaryExpression.Type.UnwrapNullableType() == typeof(Enum))
                 {
                     return sqlOperand;
                 }

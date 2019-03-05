@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -13,6 +14,8 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
     {
         private readonly List<IMethodCallTranslator> _plugins = new List<IMethodCallTranslator>();
         private readonly List<IMethodCallTranslator> _translators = new List<IMethodCallTranslator>();
+        private readonly IRelationalTypeMappingSource _typeMappingSource;
+        private readonly ITypeMappingApplyingExpressionVisitor _typeMappingApplyingExpressionVisitor;
 
         public RelationalMethodCallTranslatorProvider(
             IRelationalTypeMappingSource typeMappingSource,
@@ -24,13 +27,29 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
             _translators.AddRange(
                 new IMethodCallTranslator[] {
                     new EqualsTranslator(typeMappingSource),
+                    new IsNullOrEmptyTranslator(typeMappingSource),
                     new ContainsTranslator(typeMappingSource, typeMappingApplyingExpressionVisitor),
-                    new StringConcatTranslator()
+                    new LikeTranslator(typeMappingSource, typeMappingApplyingExpressionVisitor),
+                    new EnumHasFlagTranslator(typeMappingSource, typeMappingApplyingExpressionVisitor),
+                    new StringConcatTranslator(),
+                    new GetValueOrDefaultTranslator(typeMappingApplyingExpressionVisitor)
                 });
+            _typeMappingSource = typeMappingSource;
+            _typeMappingApplyingExpressionVisitor = typeMappingApplyingExpressionVisitor;
         }
 
-        public SqlExpression Translate(SqlExpression instance, MethodInfo method, IList<SqlExpression> arguments)
+        public SqlExpression Translate(IModel model, SqlExpression instance, MethodInfo method, IList<SqlExpression> arguments)
         {
+            var dbFunctionTranslation = ((IMethodCallTranslator)model.Relational().FindDbFunction(method))
+                ?.Translate(instance, method, arguments);
+
+            if (dbFunctionTranslation != null)
+            {
+                return _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+                    dbFunctionTranslation,
+                    _typeMappingSource.FindMapping(dbFunctionTranslation.Type));
+            }
+
             return _plugins.Concat(_translators)
                 .Select(t => t.Translate(instance, method, arguments))
                 .FirstOrDefault(t => t != null);
