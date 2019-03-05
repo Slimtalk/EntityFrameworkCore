@@ -90,7 +90,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 .TryAdd<ICompiledQueryCacheKeyGenerator, SqlServerCompiledQueryCacheKeyGenerator>()
                 .TryAdd<IExecutionStrategyFactory, SqlServerExecutionStrategyFactory>()
                 .TryAdd<IQueryCompilationContextFactory, SqlServerQueryCompilationContextFactory>()
-                .TryAdd<EntityFrameworkCore.Query.ExpressionTranslators.IMemberTranslator, SqlServerCompositeMemberTranslator>()
                 .TryAdd<ICompositeMethodCallTranslator, SqlServerCompositeMethodCallTranslator>()
                 .TryAdd<IQuerySqlGeneratorFactory, SqlServerQuerySqlGeneratorFactory>()
                 .TryAdd<ISqlTranslatingExpressionVisitorFactory, SqlServerSqlTranslatingExpressionVisitorFactory>()

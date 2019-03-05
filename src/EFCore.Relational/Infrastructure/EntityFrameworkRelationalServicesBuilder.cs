@@ -74,7 +74,6 @@ namespace Microsoft.EntityFrameworkCore.Infrastructure
                 { typeof(IExpressionFragmentTranslator), new ServiceCharacteristics(ServiceLifetime.Singleton) },
                 { typeof(ISqlTranslatingExpressionVisitorFactory), new ServiceCharacteristics(ServiceLifetime.Singleton) },
                 { typeof(IUpdateSqlGenerator), new ServiceCharacteristics(ServiceLifetime.Singleton) },
-                { typeof(Query.ExpressionTranslators.IMemberTranslator), new ServiceCharacteristics(ServiceLifetime.Singleton) },
                 { typeof(ICompositeMethodCallTranslator), new ServiceCharacteristics(ServiceLifetime.Singleton) },
                 { typeof(IQuerySqlGeneratorFactory), new ServiceCharacteristics(ServiceLifetime.Singleton) },
                 { typeof(IRelationalTransactionFactory), new ServiceCharacteristics(ServiceLifetime.Singleton) },
@@ -94,7 +93,6 @@ namespace Microsoft.EntityFrameworkCore.Infrastructure
                 { typeof(INamedConnectionStringResolver), new ServiceCharacteristics(ServiceLifetime.Scoped) },
                 { typeof(IRelationalTypeMappingSourcePlugin), new ServiceCharacteristics(ServiceLifetime.Singleton, multipleRegistrations: true) },
                 { typeof(Query.ExpressionTranslators.IMethodCallTranslatorPlugin), new ServiceCharacteristics(ServiceLifetime.Singleton, multipleRegistrations: true) },
-                { typeof(Query.ExpressionTranslators.IMemberTranslatorPlugin), new ServiceCharacteristics(ServiceLifetime.Singleton, multipleRegistrations: true) },
 
                 // New Query Pipeline
                 { typeof(IQuerySqlGeneratorFactory2), new ServiceCharacteristics(ServiceLifetime.Singleton) },
@@ -190,7 +188,6 @@ namespace Microsoft.EntityFrameworkCore.Infrastructure
             TryAdd<IShapedQueryOptimizingExpressionVisitorsFactory, RelationalShapedQueryOptimizingExpressionVisitorsFactory>();
 
             ServiceCollectionMap.GetInfrastructure()
-                .AddDependencySingleton<RelationalCompositeMemberTranslatorDependencies>()
                 .AddDependencySingleton<RelationalSqlGenerationHelperDependencies>()
                 .AddDependencySingleton<RelationalTypeMappingSourceDependencies>()
                 .AddDependencySingleton<RelationalCompositeExpressionFragmentTranslatorDependencies>()

@@ -82,7 +82,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 .TryAdd<IMigrationsSqlGenerator, SqliteMigrationsSqlGenerator>()
                 .TryAdd<IRelationalDatabaseCreator, SqliteDatabaseCreator>()
                 .TryAdd<IHistoryRepository, SqliteHistoryRepository>()
-                .TryAdd<EntityFrameworkCore.Query.ExpressionTranslators.IMemberTranslator, SqliteCompositeMemberTranslator>()
                 .TryAdd<ICompositeMethodCallTranslator, SqliteCompositeMethodCallTranslator>()
                 .TryAdd<IQuerySqlGeneratorFactory, SqliteQuerySqlGeneratorFactory>()
                 .TryAdd<ISqlTranslatingExpressionVisitorFactory, SqliteSqlTranslatingExpressionVisitorFactory>()
