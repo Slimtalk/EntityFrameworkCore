@@ -24,12 +24,12 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
         {
             if (Equals(member.OnInterface(typeof(IGeometryCollection)), _count))
             {
-                return new SqlFunctionExpression(
-                    "NumGeometries",
-                    new[] { instance },
-                    returnType,
-                    _typeMappingSource.FindMapping(returnType),
-                    false);
+                //return new SqlFunctionExpression(
+                //    "NumGeometries",
+                //    new[] { instance },
+                //    returnType,
+                //    _typeMappingSource.FindMapping(returnType),
+                //    false);
             }
 
             return null;

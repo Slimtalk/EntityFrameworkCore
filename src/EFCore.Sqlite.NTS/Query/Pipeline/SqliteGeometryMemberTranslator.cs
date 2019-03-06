@@ -34,11 +34,11 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
 
         private static readonly MemberInfo _geometryType = typeof(IGeometry).GetRuntimeProperty(nameof(IGeometry.GeometryType));
         private static readonly MemberInfo _ogcGeometryType = typeof(IGeometry).GetRuntimeProperty(nameof(IGeometry.OgcGeometryType));
-        private readonly IRelationalTypeMappingSource _typeMappingSource;
+        private readonly ISqlExpressionFactory _sqlExpressionFactory;
 
-        public SqliteGeometryMemberTranslator(IRelationalTypeMappingSource typeMappingSource)
+        public SqliteGeometryMemberTranslator(ISqlExpressionFactory sqlExpressionFactory)
         {
-            _typeMappingSource = typeMappingSource;
+            _sqlExpressionFactory = sqlExpressionFactory;
         }
 
         public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType)
@@ -46,22 +46,15 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
             member = member.OnInterface(typeof(IGeometry));
             if (_memberToFunctionName.TryGetValue(member, out var functionName))
             {
-                SqlExpression translation = new SqlFunctionExpression(
-                    functionName,
-                    new[] {
-                        instance
-                    },
-                    returnType,
-                    _typeMappingSource.FindMapping(returnType),
-                    false);
+                SqlExpression translation = _sqlExpressionFactory.SqlFunction(functionName, new[] { instance }, returnType, null);
 
                 if (returnType == typeof(bool))
                 {
-                    translation = new CaseExpression(
+                    translation = _sqlExpressionFactory.Case(
                         new[]
                         {
                             new CaseWhenClause(
-                                new SqlNullExpression(instance, true, _typeMappingSource.FindMapping(typeof(bool))),
+                                _sqlExpressionFactory.IsNotNull(instance),
                                 translation)
                         },
                         null);
@@ -72,73 +65,61 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
 
             if (Equals(member, _geometryType))
             {
-                var stringTypeMapping = _typeMappingSource.FindMapping(returnType);
-
-                return new CaseExpression(
-                    new SqlFunctionExpression(
+                return _sqlExpressionFactory.Case(
+                    _sqlExpressionFactory.SqlFunction(
                         "rtrim",
                         new SqlExpression[]
                         {
-                            new SqlFunctionExpression(
+                            _sqlExpressionFactory.SqlFunction(
                                 "GeometryType",
-                                new[] {
-                                    instance
+                                new []
+                                {
+                                    instance,
                                 },
                                 returnType,
-                                stringTypeMapping,
-                                false),
-                            MakeSqlConstant(" ZM", stringTypeMapping)
+                                null),
+                            _sqlExpressionFactory.Constant(" ZM")
                         },
                         returnType,
-                        stringTypeMapping,
-                        false),
-                    new CaseWhenClause(MakeSqlConstant("POINT", stringTypeMapping), MakeSqlConstant("Point", stringTypeMapping)),
-                    new CaseWhenClause(MakeSqlConstant("LINESTRING", stringTypeMapping), MakeSqlConstant("LineString", stringTypeMapping)),
-                    new CaseWhenClause(MakeSqlConstant("POLYGON", stringTypeMapping), MakeSqlConstant("Polygon", stringTypeMapping)),
-                    new CaseWhenClause(MakeSqlConstant("MULTIPOINT", stringTypeMapping), MakeSqlConstant("MultiPoint", stringTypeMapping)),
-                    new CaseWhenClause(MakeSqlConstant("MULTILINESTRING", stringTypeMapping), MakeSqlConstant("MultiLineString", stringTypeMapping)),
-                    new CaseWhenClause(MakeSqlConstant("MULTIPOLYGON", stringTypeMapping), MakeSqlConstant("MultiPolygon", stringTypeMapping)),
-                    new CaseWhenClause(MakeSqlConstant("GEOMETRYCOLLECTION", stringTypeMapping), MakeSqlConstant("GeometryCollection", stringTypeMapping)));
+                        null),
+                    new CaseWhenClause(_sqlExpressionFactory.Constant("POINT"), _sqlExpressionFactory.Constant("Point")),
+                    new CaseWhenClause(_sqlExpressionFactory.Constant("LINESTRING"), _sqlExpressionFactory.Constant("LineString")),
+                    new CaseWhenClause(_sqlExpressionFactory.Constant("POLYGON"), _sqlExpressionFactory.Constant("Polygon")),
+                    new CaseWhenClause(_sqlExpressionFactory.Constant("MULTIPOINT"), _sqlExpressionFactory.Constant("MultiPoint")),
+                    new CaseWhenClause(_sqlExpressionFactory.Constant("MULTILINESTRING"), _sqlExpressionFactory.Constant("MultiLineString")),
+                    new CaseWhenClause(_sqlExpressionFactory.Constant("MULTIPOLYGON"), _sqlExpressionFactory.Constant("MultiPolygon")),
+                    new CaseWhenClause(_sqlExpressionFactory.Constant("GEOMETRYCOLLECTION"), _sqlExpressionFactory.Constant("GeometryCollection")));
             }
 
             if (Equals(member, _ogcGeometryType))
             {
-                var stringTypeMapping = _typeMappingSource.FindMapping(typeof(string));
-                var typeMapping = _typeMappingSource.FindMapping(returnType);
-
-                return new CaseExpression(
-                    new SqlFunctionExpression(
+                return _sqlExpressionFactory.Case(
+                    _sqlExpressionFactory.SqlFunction(
                         "rtrim",
                         new SqlExpression[]
                         {
-                            new SqlFunctionExpression(
+                            _sqlExpressionFactory.SqlFunction(
                                 "GeometryType",
-                                new[] {
-                                    instance
+                                new []
+                                {
+                                    instance,
                                 },
                                 returnType,
-                                stringTypeMapping,
-                                false),
-                            MakeSqlConstant(" ZM", stringTypeMapping)
+                                null),
+                            _sqlExpressionFactory.Constant(" ZM")
                         },
                         returnType,
-                        stringTypeMapping,
-                        false),
-                    new CaseWhenClause(MakeSqlConstant("POINT", stringTypeMapping), MakeSqlConstant(OgcGeometryType.Point, typeMapping)),
-                    new CaseWhenClause(MakeSqlConstant("LINESTRING", stringTypeMapping), MakeSqlConstant(OgcGeometryType.LineString, typeMapping)),
-                    new CaseWhenClause(MakeSqlConstant("POLYGON", stringTypeMapping), MakeSqlConstant(OgcGeometryType.Polygon, typeMapping)),
-                    new CaseWhenClause(MakeSqlConstant("MULTIPOINT", stringTypeMapping), MakeSqlConstant(OgcGeometryType.MultiPoint, typeMapping)),
-                    new CaseWhenClause(MakeSqlConstant("MULTILINESTRING", stringTypeMapping), MakeSqlConstant(OgcGeometryType.MultiLineString, typeMapping)),
-                    new CaseWhenClause(MakeSqlConstant("MULTIPOLYGON", stringTypeMapping), MakeSqlConstant(OgcGeometryType.MultiPolygon, typeMapping)),
-                    new CaseWhenClause(MakeSqlConstant("GEOMETRYCOLLECTION", stringTypeMapping), MakeSqlConstant(OgcGeometryType.GeometryCollection, typeMapping)));
+                        null),
+                    new CaseWhenClause(_sqlExpressionFactory.Constant("POINT"), _sqlExpressionFactory.Constant(OgcGeometryType.Point)),
+                    new CaseWhenClause(_sqlExpressionFactory.Constant("LINESTRING"), _sqlExpressionFactory.Constant(OgcGeometryType.LineString)),
+                    new CaseWhenClause(_sqlExpressionFactory.Constant("POLYGON"), _sqlExpressionFactory.Constant(OgcGeometryType.Polygon)),
+                    new CaseWhenClause(_sqlExpressionFactory.Constant("MULTIPOINT"), _sqlExpressionFactory.Constant(OgcGeometryType.MultiPoint)),
+                    new CaseWhenClause(_sqlExpressionFactory.Constant("MULTILINESTRING"), _sqlExpressionFactory.Constant(OgcGeometryType.MultiLineString)),
+                    new CaseWhenClause(_sqlExpressionFactory.Constant("MULTIPOLYGON"), _sqlExpressionFactory.Constant(OgcGeometryType.MultiPolygon)),
+                    new CaseWhenClause(_sqlExpressionFactory.Constant("GEOMETRYCOLLECTION"), _sqlExpressionFactory.Constant(OgcGeometryType.GeometryCollection)));
             }
 
             return null;
-        }
-
-        private SqlConstantExpression MakeSqlConstant(object value, RelationalTypeMapping typeMapping)
-        {
-            return new SqlConstantExpression(Expression.Constant(value), typeMapping);
         }
     }
 }

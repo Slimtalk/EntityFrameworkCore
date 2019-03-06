@@ -23,16 +23,16 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType)
         {
-            if (Equals(member.OnInterface(typeof(IGeometryCollection)), _count))
-            {
-                return new SqlFunctionExpression(
-                    instance,
-                    "STNumGeometries",
-                    Enumerable.Empty<SqlExpression>(),
-                    returnType,
-                    _typeMappingSource.FindMapping(returnType),
-                    false);
-            }
+            //if (Equals(member.OnInterface(typeof(IGeometryCollection)), _count))
+            //{
+            //    return new SqlFunctionExpression(
+            //        instance,
+            //        "STNumGeometries",
+            //        Enumerable.Empty<SqlExpression>(),
+            //        returnType,
+            //        _typeMappingSource.FindMapping(returnType),
+            //        false);
+            //}
 
             return null;
         }

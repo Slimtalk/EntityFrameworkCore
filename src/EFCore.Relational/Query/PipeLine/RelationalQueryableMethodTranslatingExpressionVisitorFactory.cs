@@ -10,6 +10,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
     public class RelationalQueryableMethodTranslatingExpressionVisitorFactory : IQueryableMethodTranslatingExpressionVisitorFactory
     {
         private readonly IModel _model;
+        private readonly ISqlExpressionFactory _sqlExpressionFactory;
         private readonly IRelationalTypeMappingSource _typeMappingSource;
         private readonly ITypeMappingApplyingExpressionVisitor _typeMappingApplyingExpressionVisitor;
         private readonly IMemberTranslatorProvider _memberTranslatorProvider;
@@ -17,12 +18,14 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
 
         public RelationalQueryableMethodTranslatingExpressionVisitorFactory(
             IModel model,
+            ISqlExpressionFactory sqlExpressionFactory,
             IRelationalTypeMappingSource typeMappingSource,
             ITypeMappingApplyingExpressionVisitor typeMappingApplyingExpressionVisitor,
             IMemberTranslatorProvider memberTranslatorProvider,
             IMethodCallTranslatorProvider methodCallTranslatorProvider)
         {
             _model = model;
+            _sqlExpressionFactory = sqlExpressionFactory;
             _typeMappingSource = typeMappingSource;
             _typeMappingApplyingExpressionVisitor = typeMappingApplyingExpressionVisitor;
             _memberTranslatorProvider = memberTranslatorProvider;
@@ -33,6 +36,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
         {
             return new RelationalQueryableMethodTranslatingExpressionVisitor(
                 _model,
+                _sqlExpressionFactory,
                 _typeMappingSource,
                 _typeMappingApplyingExpressionVisitor,
                 _memberTranslatorProvider,

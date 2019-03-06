@@ -30,26 +30,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
             SqlExpression operand,
             IReadOnlyList<CaseWhenClause> whenClauses,
             SqlExpression elseResult)
-            : base(whenClauses[0].Result.Type, whenClauses[0].Result.TypeMapping, false, true)
-        {
-            Operand = operand?.ConvertToValue(true);
-            var testValue = operand != null;
-            foreach (var whenClause in whenClauses)
-            {
-                _whenClauses.Add(
-                    new CaseWhenClause(
-                        whenClause.Test.ConvertToValue(testValue),
-                        whenClause.Result.ConvertToValue(true)));
-            }
-            ElseResult = elseResult?.ConvertToValue(true);
-        }
-
-        private CaseExpression(
-            SqlExpression operand,
-            IReadOnlyList<CaseWhenClause> whenClauses,
-            SqlExpression elseResult,
-            bool treatAsValue)
-            : base(whenClauses[0].Result.Type, whenClauses[0].Result.TypeMapping, false, treatAsValue)
+            : base(whenClauses[0].Result.Type, whenClauses[0].Result.TypeMapping)
         {
             Operand = operand;
             _whenClauses.AddRange(whenClauses);
@@ -81,13 +62,14 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
             changed |= elseResult != ElseResult;
 
             return changed
-                ? new CaseExpression(Operand, whenClauses, elseResult, ShouldBeValue)
+                ? new CaseExpression(Operand, whenClauses, elseResult)
                 : this;
         }
 
-        public override SqlExpression ConvertToValue(bool treatAsValue)
+        public virtual CaseExpression Update(
+            SqlExpression operand, IReadOnlyList<CaseWhenClause> whenClauses, SqlExpression elseResult)
         {
-            return new CaseExpression(Operand, WhenClauses, ElseResult, treatAsValue);
+            return new CaseExpression(operand, whenClauses, elseResult);
         }
 
         public SqlExpression Operand { get; }

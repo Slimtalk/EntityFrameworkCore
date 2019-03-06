@@ -256,17 +256,17 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
                 startDate = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(startDate, typeMapping);
                 endDate = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(endDate, typeMapping);
 
-                return new SqlFunctionExpression(
-                    "DATEDIFF",
-                    new[]
-                    {
-                        new SqlFragmentExpression(datePart),
-                        startDate,
-                        endDate
-                    },
-                    typeof(int),
-                    _typeMappingSource.FindMapping(typeof(int)),
-                    false);
+                //return new SqlFunctionExpression(
+                //    "DATEDIFF",
+                //    new[]
+                //    {
+                //        new SqlFragmentExpression(datePart),
+                //        startDate,
+                //        endDate
+                //    },
+                //    typeof(int),
+                //    _typeMappingSource.FindMapping(typeof(int)),
+                //    false);
             }
 
             return null;

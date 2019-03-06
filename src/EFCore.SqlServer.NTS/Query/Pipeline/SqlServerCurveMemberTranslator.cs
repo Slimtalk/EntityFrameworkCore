@@ -48,13 +48,13 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
                         ? _typeMappingSource.FindMapping(returnType, storeType)
                         : _typeMappingSource.FindMapping(returnType);
 
-                return new SqlFunctionExpression(
-                    instance,
-                    functionName,
-                    Enumerable.Empty<SqlExpression>(),
-                    returnType,
-                    resultTypeMapping,
-                    false);
+                //return new SqlFunctionExpression(
+                //    instance,
+                //    functionName,
+                //    Enumerable.Empty<SqlExpression>(),
+                //    returnType,
+                //    resultTypeMapping,
+                //    false);
 
             }
 

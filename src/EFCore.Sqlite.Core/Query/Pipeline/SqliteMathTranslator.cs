@@ -54,43 +54,43 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MethodInfo method, IList<SqlExpression> arguments)
         {
-            if (_supportedMethods.TryGetValue(method, out var sqlFunctionName))
-            {
-                RelationalTypeMapping typeMapping = null;
-                var newArguments = new List<SqlExpression>();
+            //if (_supportedMethods.TryGetValue(method, out var sqlFunctionName))
+            //{
+            //    RelationalTypeMapping typeMapping = null;
+            //    var newArguments = new List<SqlExpression>();
 
-                if (string.Equals(method.Name, nameof(Math.Round)))
-                {
-                    typeMapping = _typeMappingSource.FindMapping(typeof(double));
-                    newArguments.Add(_typeMappingApplyingExpressionVisitor.ApplyTypeMapping(arguments[0], typeMapping));
-                    if (arguments.Count == 2)
-                    {
-                        newArguments.Add(
-                            _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                                arguments[1], _typeMappingSource.FindMapping(typeof(int))));
-                    }
-                }
-                else
-                {
-                    typeMapping = (arguments.Count == 1
-                        ? ExpressionExtensions.InferTypeMapping(arguments[0])
-                        : ExpressionExtensions.InferTypeMapping(arguments[0], arguments[1]))
-                        ?? _typeMappingSource.FindMapping(arguments[0].Type);
+            //    if (string.Equals(method.Name, nameof(Math.Round)))
+            //    {
+            //        typeMapping = _typeMappingSource.FindMapping(typeof(double));
+            //        newArguments.Add(_typeMappingApplyingExpressionVisitor.ApplyTypeMapping(arguments[0], typeMapping));
+            //        if (arguments.Count == 2)
+            //        {
+            //            newArguments.Add(
+            //                _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //                    arguments[1], _typeMappingSource.FindMapping(typeof(int))));
+            //        }
+            //    }
+            //    else
+            //    {
+            //        typeMapping = (arguments.Count == 1
+            //            ? ExpressionExtensions.InferTypeMapping(arguments[0])
+            //            : ExpressionExtensions.InferTypeMapping(arguments[0], arguments[1]))
+            //            ?? _typeMappingSource.FindMapping(arguments[0].Type);
 
-                    newArguments.Add(_typeMappingApplyingExpressionVisitor.ApplyTypeMapping(arguments[0], typeMapping));
-                    if (arguments.Count == 2)
-                    {
-                        newArguments.Add(_typeMappingApplyingExpressionVisitor.ApplyTypeMapping(arguments[1], typeMapping));
-                    }
-                }
+            //        newArguments.Add(_typeMappingApplyingExpressionVisitor.ApplyTypeMapping(arguments[0], typeMapping));
+            //        if (arguments.Count == 2)
+            //        {
+            //            newArguments.Add(_typeMappingApplyingExpressionVisitor.ApplyTypeMapping(arguments[1], typeMapping));
+            //        }
+            //    }
 
-                return new SqlFunctionExpression(
-                    sqlFunctionName,
-                    newArguments,
-                    method.ReturnType,
-                    typeMapping,
-                    false);
-            }
+            //    return new SqlFunctionExpression(
+            //        sqlFunctionName,
+            //        newArguments,
+            //        method.ReturnType,
+            //        typeMapping,
+            //        false);
+            //}
 
             return null;
         }

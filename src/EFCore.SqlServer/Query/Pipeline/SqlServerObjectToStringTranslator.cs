@@ -48,24 +48,25 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MethodInfo method, IList<SqlExpression> arguments)
         {
-            return method.Name == nameof(ToString)
-                   && arguments.Count == 0
-                   && instance != null
-                   && _typeMapping.TryGetValue(
-                       instance.Type.UnwrapNullableType(),
-                       out var storeType)
-                ? new SqlFunctionExpression(
-                    "CONVERT",
-                    new[]
-                    {
-                        new SqlFragmentExpression(storeType),
-                        _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                            instance, _typeMappingSource.FindMapping(instance.Type))
-                    },
-                    typeof(string),
-                    _typeMappingSource.FindMapping(typeof(string)),
-                    false)
-                : null;
+            return null;
+            //return method.Name == nameof(ToString)
+            //       && arguments.Count == 0
+            //       && instance != null
+            //       && _typeMapping.TryGetValue(
+            //           instance.Type.UnwrapNullableType(),
+            //           out var storeType)
+            //    ? new SqlFunctionExpression(
+            //        "CONVERT",
+            //        new[]
+            //        {
+            //            new SqlFragmentExpression(storeType),
+            //            _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //                instance, _typeMappingSource.FindMapping(instance.Type))
+            //        },
+            //        typeof(string),
+            //        _typeMappingSource.FindMapping(typeof(string)),
+            //        false)
+            //    : null;
         }
     }
 }

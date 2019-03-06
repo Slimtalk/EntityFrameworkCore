@@ -22,17 +22,17 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType)
         {
-            if (Equals(member, _count))
-            {
-                return new SqlFunctionExpression(
-                    "NumPoints",
-                    new[] {
-                        instance
-                    },
-                    returnType,
-                    _typeMappingSource.FindMapping(returnType),
-                    false);
-            }
+            //if (Equals(member, _count))
+            //{
+            //    return new SqlFunctionExpression(
+            //        "NumPoints",
+            //        new[] {
+            //            instance
+            //        },
+            //        returnType,
+            //        _typeMappingSource.FindMapping(returnType),
+            //        false);
+            //}
 
             return null;
         }

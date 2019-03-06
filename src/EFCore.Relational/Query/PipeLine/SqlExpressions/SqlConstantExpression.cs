@@ -11,13 +11,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
         private readonly ConstantExpression _constantExpression;
 
         public SqlConstantExpression(ConstantExpression constantExpression, RelationalTypeMapping typeMapping)
-            : base(constantExpression.Type, typeMapping, false, true)
-        {
-            _constantExpression = constantExpression;
-        }
-
-        private SqlConstantExpression(ConstantExpression constantExpression, RelationalTypeMapping typeMapping, bool treatAsValue)
-            : base(constantExpression.Type, typeMapping, false, treatAsValue)
+            : base(constantExpression.Type, typeMapping)
         {
             _constantExpression = constantExpression;
         }
@@ -30,11 +24,6 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
         protected override Expression VisitChildren(ExpressionVisitor visitor)
         {
             return this;
-        }
-
-        public override SqlExpression ConvertToValue(bool treatAsValue)
-        {
-            return new SqlConstantExpression(_constantExpression, TypeMapping, treatAsValue);
         }
 
         public object Value => _constantExpression.Value;

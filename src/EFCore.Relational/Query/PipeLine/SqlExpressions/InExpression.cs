@@ -10,24 +10,18 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
     public class InExpression : SqlExpression
     {
         public InExpression(SqlExpression item, bool negated, SelectExpression subquery, RelationalTypeMapping typeMapping)
-            : base(typeof(bool), typeMapping, true, false)
+            : this(item, negated, null, subquery, typeMapping)
         {
-            Item = item;
-            Negated = negated;
-            Subquery = subquery;
         }
 
         public InExpression(SqlExpression item, bool negated, SqlExpression values, RelationalTypeMapping typeMapping)
-            : base(typeof(bool), typeMapping, true, false)
+            : this(item, negated, values, null, typeMapping)
         {
-            Item = item;
-            Negated = negated;
-            Values = values;
         }
 
         private InExpression(SqlExpression item, bool negated, SqlExpression values, SelectExpression subquery,
-            RelationalTypeMapping typeMapping, bool treatAsValue)
-            : base(typeof(bool), typeMapping, true, treatAsValue)
+            RelationalTypeMapping typeMapping)
+            : base(typeof(bool), typeMapping)
         {
             Item = item;
             Negated = negated;
@@ -47,13 +41,8 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
             var values = (SqlExpression)visitor.Visit(Values);
 
             return newItem != Item || subquery != Subquery || values != Values
-                ? new InExpression(newItem, Negated, values, subquery, TypeMapping, ShouldBeValue)
+                ? new InExpression(newItem, Negated, values, subquery, TypeMapping)
                 : this;
-        }
-
-        public override SqlExpression ConvertToValue(bool treatAsValue)
-        {
-            return new InExpression(Item, Negated, Values, Subquery, TypeMapping, treatAsValue);
         }
 
         public override bool Equals(object obj)

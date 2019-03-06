@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Query.Pipeline;
+using Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions;
 
 namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
 {
@@ -18,7 +19,22 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
 
         public override IEnumerable<ExpressionVisitor> GetVisitors()
         {
+            yield return new SelectExpressionProjectionApplyingExpressionVisitor();
             yield return new NullComparisonTransformingExpressionVisitor();
         }
+    }
+
+    public class SelectExpressionProjectionApplyingExpressionVisitor : ExpressionVisitor
+    {
+        protected override Expression VisitExtension(Expression node)
+        {
+            if (node is SelectExpression selectExpression)
+            {
+                selectExpression.ApplyProjection();
+            }
+
+            return base.VisitExtension(node);
+        }
+
     }
 }

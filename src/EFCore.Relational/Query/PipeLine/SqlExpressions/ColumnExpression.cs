@@ -11,23 +11,18 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
 {
     public class ColumnExpression : SqlExpression
     {
-        public ColumnExpression(IProperty property, TableExpressionBase table)
-            : base(property.ClrType, property.FindRelationalMapping(), false, true)
+        internal ColumnExpression(IProperty property, TableExpressionBase table)
+            : this(property.Relational().ColumnName, table, property.ClrType, property.FindRelationalMapping())
         {
-            Name = property.Relational().ColumnName;
-            Table = table;
         }
 
-        public ColumnExpression(ProjectionExpression subqueryProjection, TableExpressionBase table)
-            : base(subqueryProjection.Type, subqueryProjection.SqlExpression.TypeMapping, false, true)
+        internal ColumnExpression(ProjectionExpression subqueryProjection, TableExpressionBase table)
+            : this(subqueryProjection.Alias, table, subqueryProjection.Type, subqueryProjection.SqlExpression.TypeMapping)
         {
-            Name = subqueryProjection.Alias;
-            Table = table;
         }
 
-        private ColumnExpression(string name, TableExpressionBase table,
-            Type type, RelationalTypeMapping typeMapping, bool treatAsValue)
-            : base(type, typeMapping, false, treatAsValue)
+        private ColumnExpression(string name, TableExpressionBase table, Type type, RelationalTypeMapping typeMapping)
+            : base(type, typeMapping)
         {
             Name = name;
             Table = table;
@@ -38,13 +33,8 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
             var newTable = (TableExpressionBase)visitor.Visit(Table);
 
             return newTable != Table
-                ? new ColumnExpression(Name, newTable, Type, TypeMapping, ShouldBeValue)
+                ? new ColumnExpression(Name, newTable, Type, TypeMapping)
                 : this;
-        }
-
-        public override SqlExpression ConvertToValue(bool treatAsValue)
-        {
-            return new ColumnExpression(Name, Table, Type, TypeMapping, treatAsValue);
         }
 
         public string Name { get; }

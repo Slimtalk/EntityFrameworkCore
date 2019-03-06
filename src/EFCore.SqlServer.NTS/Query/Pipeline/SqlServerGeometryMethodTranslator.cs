@@ -61,97 +61,97 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MethodInfo method, IList<SqlExpression> arguments)
         {
-            if (typeof(IGeometry).IsAssignableFrom(method.DeclaringType))
-            {
-                var geometryExpressions = new[] { instance }.Concat(
-                    arguments.Where(e => typeof(IGeometry).IsAssignableFrom(e.Type)));
-                var typeMapping = ExpressionExtensions.InferTypeMapping(geometryExpressions.ToArray());
+            //if (typeof(IGeometry).IsAssignableFrom(method.DeclaringType))
+            //{
+            //    var geometryExpressions = new[] { instance }.Concat(
+            //        arguments.Where(e => typeof(IGeometry).IsAssignableFrom(e.Type)));
+            //    var typeMapping = ExpressionExtensions.InferTypeMapping(geometryExpressions.ToArray());
 
-                Debug.Assert(typeMapping != null, "At least one argument must have typeMapping.");
-                var storeType = typeMapping.StoreType;
-                var isGeography = string.Equals(storeType, "geography", StringComparison.OrdinalIgnoreCase);
+            //    Debug.Assert(typeMapping != null, "At least one argument must have typeMapping.");
+            //    var storeType = typeMapping.StoreType;
+            //    var isGeography = string.Equals(storeType, "geography", StringComparison.OrdinalIgnoreCase);
 
-                method = method.OnInterface(typeof(IGeometry));
-                if (_methodToFunctionName.TryGetValue(method, out var functionName)
-                    || (!isGeography && _geometryMethodToFunctionName.TryGetValue(method, out functionName)))
-                {
-                    instance = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                        instance, _typeMappingSource.FindMapping(instance.Type, storeType));
+            //    method = method.OnInterface(typeof(IGeometry));
+            //    if (_methodToFunctionName.TryGetValue(method, out var functionName)
+            //        || (!isGeography && _geometryMethodToFunctionName.TryGetValue(method, out functionName)))
+            //    {
+            //        instance = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //            instance, _typeMappingSource.FindMapping(instance.Type, storeType));
 
-                    var typeMappedArguments = new List<SqlExpression>();
-                    foreach (var argument in arguments)
-                    {
-                        typeMappedArguments.Add(
-                            _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                                argument,
-                                typeof(IGeometry).IsAssignableFrom(argument.Type)
-                                    ? _typeMappingSource.FindMapping(argument.Type, storeType)
-                                    : _typeMappingSource.FindMapping(argument.Type)));
-                    }
+            //        var typeMappedArguments = new List<SqlExpression>();
+            //        foreach (var argument in arguments)
+            //        {
+            //            typeMappedArguments.Add(
+            //                _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //                    argument,
+            //                    typeof(IGeometry).IsAssignableFrom(argument.Type)
+            //                        ? _typeMappingSource.FindMapping(argument.Type, storeType)
+            //                        : _typeMappingSource.FindMapping(argument.Type)));
+            //        }
 
-                    var resultTypeMapping = typeof(IGeometry).IsAssignableFrom(method.ReturnType)
-                        ? _typeMappingSource.FindMapping(method.ReturnType, storeType)
-                        : _typeMappingSource.FindMapping(method.ReturnType);
+            //        var resultTypeMapping = typeof(IGeometry).IsAssignableFrom(method.ReturnType)
+            //            ? _typeMappingSource.FindMapping(method.ReturnType, storeType)
+            //            : _typeMappingSource.FindMapping(method.ReturnType);
 
-                    return new SqlFunctionExpression(
-                        instance,
-                        functionName,
-                        Simplify(typeMappedArguments, isGeography),
-                        method.ReturnType,
-                        resultTypeMapping,
-                        false);
-                }
+            //        return new SqlFunctionExpression(
+            //            instance,
+            //            functionName,
+            //            Simplify(typeMappedArguments, isGeography),
+            //            method.ReturnType,
+            //            resultTypeMapping,
+            //            false);
+            //    }
 
-                if (Equals(method, _getGeometryN))
-                {
-                    return new SqlFunctionExpression(
-                        instance,
-                        "STGeometryN",
-                        new[] {
-                            _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                                new SqlBinaryExpression(
-                                    ExpressionType.Add,
-                                    arguments[0],
-                                    new SqlConstantExpression(Expression.Constant(1), null),
-                                    typeof(int),
-                                    null),
-                                _typeMappingSource.FindMapping(typeof(int)))
-                        },
-                        method.ReturnType,
-                        _typeMappingSource.FindMapping(method.ReturnType, storeType),
-                        false);
-                }
+            //    if (Equals(method, _getGeometryN))
+            //    {
+            //        return new SqlFunctionExpression(
+            //            instance,
+            //            "STGeometryN",
+            //            new[] {
+            //                _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //                    new SqlBinaryExpression(
+            //                        ExpressionType.Add,
+            //                        arguments[0],
+            //                        new SqlConstantExpression(Expression.Constant(1), null),
+            //                        typeof(int),
+            //                        null),
+            //                    _typeMappingSource.FindMapping(typeof(int)))
+            //            },
+            //            method.ReturnType,
+            //            _typeMappingSource.FindMapping(method.ReturnType, storeType),
+            //            false);
+            //    }
 
-                if (Equals(method, _isWithinDistance))
-                {
-                    instance = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                        instance, _typeMappingSource.FindMapping(instance.Type, storeType));
+            //    if (Equals(method, _isWithinDistance))
+            //    {
+            //        instance = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //            instance, _typeMappingSource.FindMapping(instance.Type, storeType));
 
-                    var typeMappedArguments = new List<SqlExpression>();
-                    foreach (var argument in arguments)
-                    {
-                        typeMappedArguments.Add(
-                            _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                                argument,
-                                typeof(IGeometry).IsAssignableFrom(argument.Type)
-                                    ? _typeMappingSource.FindMapping(argument.Type, storeType)
-                                    : _typeMappingSource.FindMapping(argument.Type)));
-                    }
+            //        var typeMappedArguments = new List<SqlExpression>();
+            //        foreach (var argument in arguments)
+            //        {
+            //            typeMappedArguments.Add(
+            //                _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //                    argument,
+            //                    typeof(IGeometry).IsAssignableFrom(argument.Type)
+            //                        ? _typeMappingSource.FindMapping(argument.Type, storeType)
+            //                        : _typeMappingSource.FindMapping(argument.Type)));
+            //        }
 
-                    return new SqlBinaryExpression(
-                        ExpressionType.LessThanOrEqual,
-                        new SqlFunctionExpression(
-                            instance,
-                            "STDistance",
-                            Simplify(new[] { typeMappedArguments[0] }, isGeography),
-                            typeof(double),
-                            _typeMappingSource.FindMapping(typeof(double)),
-                            false),
-                        typeMappedArguments[1],
-                        typeof(bool),
-                        _typeMappingSource.FindMapping(typeof(bool)));
-                }
-            }
+            //        return new SqlBinaryExpression(
+            //            ExpressionType.LessThanOrEqual,
+            //            new SqlFunctionExpression(
+            //                instance,
+            //                "STDistance",
+            //                Simplify(new[] { typeMappedArguments[0] }, isGeography),
+            //                typeof(double),
+            //                _typeMappingSource.FindMapping(typeof(double)),
+            //                false),
+            //            typeMappedArguments[1],
+            //            typeof(bool),
+            //            _typeMappingSource.FindMapping(typeof(bool)));
+            //    }
+            //}
 
             return null;
         }

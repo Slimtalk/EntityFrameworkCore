@@ -55,7 +55,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
                   || expression is EntityShaperExpression))
             {
 
-                var translation = _sqlTranslator.Translate(_selectExpression, expression)?.ConvertToValue(true);
+                var translation = _sqlTranslator.Translate(_selectExpression, expression);
 
                 _projectionMapping[_projectionMembers.Peek()] = translation ?? throw new InvalidOperationException();
 

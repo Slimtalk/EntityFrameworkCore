@@ -22,16 +22,16 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType)
         {
-            if (Equals(member, _count))
-            {
-                return new SqlFunctionExpression(
-                    instance,
-                    "STNumPoints",
-                    null,
-                    returnType,
-                    _typeMappingSource.FindMapping(returnType),
-                    false);
-            }
+            //if (Equals(member, _count))
+            //{
+            //    return new SqlFunctionExpression(
+            //        instance,
+            //        "STNumPoints",
+            //        null,
+            //        returnType,
+            //        _typeMappingSource.FindMapping(returnType),
+            //        false);
+            //}
 
             return null;
         }

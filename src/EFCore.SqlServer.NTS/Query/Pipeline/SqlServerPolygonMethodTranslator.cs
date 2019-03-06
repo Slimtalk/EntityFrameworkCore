@@ -29,52 +29,52 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MethodInfo method, IList<SqlExpression> arguments)
         {
-            if (typeof(IPolygon).IsAssignableFrom(method.DeclaringType))
-            {
-                var storeType = instance.TypeMapping.StoreType;
-                var isGeography = string.Equals(storeType, "geography", StringComparison.OrdinalIgnoreCase);
+            //if (typeof(IPolygon).IsAssignableFrom(method.DeclaringType))
+            //{
+            //    var storeType = instance.TypeMapping.StoreType;
+            //    var isGeography = string.Equals(storeType, "geography", StringComparison.OrdinalIgnoreCase);
 
-                method = method.OnInterface(typeof(IPolygon));
-                if (isGeography
-                    && Equals(method, _getInteriorRingN))
-                {
-                    return new SqlFunctionExpression(
-                        instance,
-                        "RingN",
-                        new[] {
-                            _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                                new SqlBinaryExpression(
-                                    ExpressionType.Add,
-                                    arguments[0],
-                                    new SqlConstantExpression(Expression.Constant(2), null),
-                                    typeof(int),
-                                    null),
-                                _typeMappingSource.FindMapping(typeof(int)))
-                        },
-                        method.ReturnType,
-                        _typeMappingSource.FindMapping(method.ReturnType, storeType),
-                        false);
-                }
-                else if (Equals(method, _getInteriorRingN))
-                {
-                    return new SqlFunctionExpression(
-                        instance,
-                        "STInteriorRingN",
-                        new[] {
-                            _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                                new SqlBinaryExpression(
-                                    ExpressionType.Add,
-                                    arguments[0],
-                                    new SqlConstantExpression(Expression.Constant(1), null),
-                                    typeof(int),
-                                    null),
-                                _typeMappingSource.FindMapping(typeof(int)))
-                        },
-                        method.ReturnType,
-                        _typeMappingSource.FindMapping(method.ReturnType, storeType),
-                        false);
-                }
-            }
+            //    method = method.OnInterface(typeof(IPolygon));
+            //    if (isGeography
+            //        && Equals(method, _getInteriorRingN))
+            //    {
+            //        return new SqlFunctionExpression(
+            //            instance,
+            //            "RingN",
+            //            new[] {
+            //                _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //                    new SqlBinaryExpression(
+            //                        ExpressionType.Add,
+            //                        arguments[0],
+            //                        new SqlConstantExpression(Expression.Constant(2), null),
+            //                        typeof(int),
+            //                        null),
+            //                    _typeMappingSource.FindMapping(typeof(int)))
+            //            },
+            //            method.ReturnType,
+            //            _typeMappingSource.FindMapping(method.ReturnType, storeType),
+            //            false);
+            //    }
+            //    else if (Equals(method, _getInteriorRingN))
+            //    {
+            //        return new SqlFunctionExpression(
+            //            instance,
+            //            "STInteriorRingN",
+            //            new[] {
+            //                _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //                    new SqlBinaryExpression(
+            //                        ExpressionType.Add,
+            //                        arguments[0],
+            //                        new SqlConstantExpression(Expression.Constant(1), null),
+            //                        typeof(int),
+            //                        null),
+            //                    _typeMappingSource.FindMapping(typeof(int)))
+            //            },
+            //            method.ReturnType,
+            //            _typeMappingSource.FindMapping(method.ReturnType, storeType),
+            //            false);
+            //    }
+            //}
 
             return null;
         }

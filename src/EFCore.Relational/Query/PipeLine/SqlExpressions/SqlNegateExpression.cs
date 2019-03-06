@@ -9,13 +9,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
     public class SqlNegateExpression : SqlExpression
     {
         public SqlNegateExpression(SqlExpression operand, RelationalTypeMapping typeMapping)
-            : base(operand.Type, typeMapping, false, true)
-        {
-            Operand = operand.ConvertToValue(true);
-        }
-
-        private SqlNegateExpression(SqlExpression operand, RelationalTypeMapping typeMapping, bool treatAsValue)
-            : base(operand.Type, typeMapping, false, treatAsValue)
+            : base(operand.Type, typeMapping)
         {
             Operand = operand;
         }
@@ -27,13 +21,8 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
             var operand = (SqlExpression)visitor.Visit(Operand);
 
             return operand != Operand
-                ? new SqlNegateExpression(operand, TypeMapping, ShouldBeValue)
+                ? new SqlNegateExpression(operand, TypeMapping)
                 : this;
-        }
-
-        public override SqlExpression ConvertToValue(bool treatAsValue)
-        {
-            return new SqlNegateExpression(Operand, TypeMapping, treatAsValue);
         }
 
         public override bool Equals(object obj)

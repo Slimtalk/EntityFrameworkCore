@@ -46,66 +46,65 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
             {
                 var memberName = member.Name;
 
-                if (_datePartMapping.TryGetValue(memberName, out var datePart))
-                {
-                    return new SqlCastExpression(
-                        SqliteExpression.Strftime(
-                            typeof(string),
-                            _stringTypeMapping,
-                            CreateStringConstant(datePart),
-                            instance),
-                        returnType,
-                        _typeMappingSource.FindMapping(returnType));
-                }
+                //if (_datePartMapping.TryGetValue(memberName, out var datePart))
+                //{
+                //    return new SqlUnaryExpression(
+                //        SqliteExpression.Strftime(
+                //            typeof(string),
+                //            _stringTypeMapping,
+                //            CreateStringConstant(datePart),
+                //            instance),
+                //        returnType,
+                //        _typeMappingSource.FindMapping(returnType));
+                //}
 
-                if (string.Equals(memberName, nameof(DateTime.Ticks)))
-                {
-                    return new SqlCastExpression(
-                        new SqlBinaryExpression(
-                            ExpressionType.Multiply,
-                            new SqlBinaryExpression(
-                                ExpressionType.Subtract,
-                                new SqlFunctionExpression(
-                                    "julianday",
-                                    new[] { instance },
-                                    typeof(double),
-                                    _doubleTypeMapping,
-                                    false),
-                                new SqlConstantExpression(
-                                    Expression.Constant(1721425.5), // NB: Result of julianday('0001-01-01 00:00:00')
-                                    _doubleTypeMapping),
-                                typeof(double),
-                                _doubleTypeMapping),
-                            new SqlConstantExpression(
-                                Expression.Constant(TimeSpan.TicksPerDay),
-                                _typeMappingSource.FindMapping(typeof(long))),
-                            typeof(double),
-                            _doubleTypeMapping),
-                        typeof(long),
-                        _typeMappingSource.FindMapping(typeof(long)));
-                }
+                //if (string.Equals(memberName, nameof(DateTime.Ticks)))
+                //{
+                //    return new SqlUnaryExpression(
+                //        new SqlBinaryExpression(
+                //            ExpressionType.Multiply,
+                //            new SqlBinaryExpression(
+                //                ExpressionType.Subtract,
+                //                new SqlFunctionExpression(
+                //                    "julianday",
+                //                    new[] { instance },
+                //                    typeof(double),
+                //                    _doubleTypeMapping),
+                //                new SqlConstantExpression(
+                //                    Expression.Constant(1721425.5), // NB: Result of julianday('0001-01-01 00:00:00')
+                //                    _doubleTypeMapping),
+                //                typeof(double),
+                //                _doubleTypeMapping),
+                //            new SqlConstantExpression(
+                //                Expression.Constant(TimeSpan.TicksPerDay),
+                //                _typeMappingSource.FindMapping(typeof(long))),
+                //            typeof(double),
+                //            _doubleTypeMapping),
+                //        typeof(long),
+                //        _typeMappingSource.FindMapping(typeof(long)));
+                //}
 
-                if (string.Equals(memberName, nameof(DateTime.Millisecond)))
-                {
-                    return new SqlBinaryExpression(
-                        ExpressionType.Modulo,
-                        new SqlBinaryExpression(
-                            ExpressionType.Multiply,
-                            new SqlCastExpression(
-                                SqliteExpression.Strftime(
-                                    typeof(string),
-                                    _stringTypeMapping,
-                                    CreateStringConstant("%f"),
-                                    instance),
-                                typeof(double),
-                                _doubleTypeMapping),
-                            new SqlConstantExpression(Expression.Constant(1000), _intTypeMapping),
-                            typeof(double),
-                            _doubleTypeMapping),
-                        new SqlConstantExpression(Expression.Constant(1000), _intTypeMapping),
-                        typeof(int),
-                        _intTypeMapping);
-                }
+                //if (string.Equals(memberName, nameof(DateTime.Millisecond)))
+                //{
+                //    return new SqlBinaryExpression(
+                //        ExpressionType.Modulo,
+                //        new SqlBinaryExpression(
+                //            ExpressionType.Multiply,
+                //            new SqlUnaryExpression(
+                //                SqliteExpression.Strftime(
+                //                    typeof(string),
+                //                    _stringTypeMapping,
+                //                    CreateStringConstant("%f"),
+                //                    instance),
+                //                typeof(double),
+                //                _doubleTypeMapping),
+                //            new SqlConstantExpression(Expression.Constant(1000), _intTypeMapping),
+                //            typeof(double),
+                //            _doubleTypeMapping),
+                //        new SqlConstantExpression(Expression.Constant(1000), _intTypeMapping),
+                //        typeof(int),
+                //        _intTypeMapping);
+                //}
 
                 var format = "%Y-%m-%d %H:%M:%f";
                 SqlExpression timestring;
@@ -163,13 +162,11 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
                                 CreateStringConstant("0")
                             },
                             returnType,
-                            typeMapping,
-                            false),
+                            typeMapping),
                         CreateStringConstant(".")
                     },
                     returnType,
-                    typeMapping,
-                    false);
+                    typeMapping);
             }
 
             return null;

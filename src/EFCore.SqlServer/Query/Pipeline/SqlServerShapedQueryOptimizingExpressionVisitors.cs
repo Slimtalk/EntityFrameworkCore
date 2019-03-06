@@ -12,12 +12,15 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
     public class SqlServerShapedQueryOptimizingExpressionVisitors : RelationalShapedQueryOptimizingExpressionVisitors
     {
         private readonly IRelationalTypeMappingSource _typeMappingSource;
+        private readonly ISqlExpressionFactory _sqlExpressionFactory;
 
         public SqlServerShapedQueryOptimizingExpressionVisitors(QueryCompilationContext2 queryCompilationContext,
-            IRelationalTypeMappingSource typeMappingSource)
+            IRelationalTypeMappingSource typeMappingSource,
+            ISqlExpressionFactory sqlExpressionFactory)
             : base(queryCompilationContext)
         {
             _typeMappingSource = typeMappingSource;
+            _sqlExpressionFactory = sqlExpressionFactory;
         }
 
         public override IEnumerable<ExpressionVisitor> GetVisitors()
@@ -27,7 +30,7 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
                 yield return visitor;
             }
 
-            yield return new SearchConditionConvertingExpressionVisitor(_typeMappingSource);
+            yield return new SearchConditionConvertingExpressionVisitor(_typeMappingSource, _sqlExpressionFactory);
         }
     }
 }

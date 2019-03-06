@@ -40,8 +40,8 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
                 case SqlBinaryExpression sqlBinaryExpression:
                     return VisitSqlBinary(sqlBinaryExpression);
 
-                case SqlCastExpression sqlCastExpression:
-                    return VisitSqlCast(sqlCastExpression);
+                case SqlUnaryExpression sqlUnaryExpression:
+                    return VisitSqlUnary(sqlUnaryExpression);
 
                 case SqlConstantExpression sqlConstantExpression:
                     return VisitSqlConstant(sqlConstantExpression);
@@ -76,7 +76,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
         protected abstract Expression VisitIn(InExpression inExpression);
         protected abstract Expression VisitProjection(ProjectionExpression projectionExpression);
         protected abstract Expression VisitCase(CaseExpression caseExpression);
-        protected abstract Expression VisitSqlCast(SqlCastExpression sqlCastExpression);
+        protected abstract Expression VisitSqlUnary(SqlUnaryExpression sqlCastExpression);
         protected abstract Expression VisitSqlNot(SqlNotExpression sqlNotExpression);
         protected abstract Expression VisitSqlNull(SqlNullExpression sqlNullExpression);
         protected abstract Expression VisitSqlFunction(SqlFunctionExpression sqlFunctionExpression);

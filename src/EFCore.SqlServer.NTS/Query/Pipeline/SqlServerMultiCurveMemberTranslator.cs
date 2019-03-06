@@ -22,16 +22,16 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType)
         {
-            if (Equals(member.OnInterface(typeof(IMultiCurve)), _isClosed))
-            {
-                return new SqlFunctionExpression(
-                    instance,
-                    "STIsClosed",
-                    null,
-                    returnType,
-                    _typeMappingSource.FindMapping(returnType),
-                    false);
-            }
+            //if (Equals(member.OnInterface(typeof(IMultiCurve)), _isClosed))
+            //{
+            //    return new SqlFunctionExpression(
+            //        instance,
+            //        "STIsClosed",
+            //        null,
+            //        returnType,
+            //        _typeMappingSource.FindMapping(returnType),
+            //        false);
+            //}
 
             return null;
         }

@@ -25,26 +25,26 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MethodInfo method, IList<SqlExpression> arguments)
         {
-            if (typeof(IGeometryCollection).IsAssignableFrom(method.DeclaringType)
-                && Equals(method.OnInterface(typeof(IGeometryCollection)), _item))
-            {
-                return new SqlFunctionExpression(
-                    instance,
-                    "STGeometryN",
-                    new[] {
-                        _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                            new SqlBinaryExpression(
-                                ExpressionType.Add,
-                                arguments[0],
-                                new SqlConstantExpression(Expression.Constant(1), null),
-                                typeof(int),
-                                null),
-                            _typeMappingSource.FindMapping(typeof(int)))
-                    },
-                    method.ReturnType,
-                    _typeMappingSource.FindMapping(typeof(IGeometry), instance.TypeMapping.StoreType),
-                    false);
-            }
+            //if (typeof(IGeometryCollection).IsAssignableFrom(method.DeclaringType)
+            //    && Equals(method.OnInterface(typeof(IGeometryCollection)), _item))
+            //{
+            //    return new SqlFunctionExpression(
+            //        instance,
+            //        "STGeometryN",
+            //        new[] {
+            //            _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //                new SqlBinaryExpression(
+            //                    ExpressionType.Add,
+            //                    arguments[0],
+            //                    new SqlConstantExpression(Expression.Constant(1), null),
+            //                    typeof(int),
+            //                    null),
+            //                _typeMappingSource.FindMapping(typeof(int)))
+            //        },
+            //        method.ReturnType,
+            //        _typeMappingSource.FindMapping(typeof(IGeometry), instance.TypeMapping.StoreType),
+            //        false);
+            //}
 
             return null;
         }

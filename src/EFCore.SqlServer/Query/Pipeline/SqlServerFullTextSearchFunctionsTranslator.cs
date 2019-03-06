@@ -81,12 +81,12 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
                         new SqlFragmentExpression($"LANGUAGE {((SqlConstantExpression)arguments[3]).Value}"));
                 }
 
-                return new SqlFunctionExpression(
-                    functionName,
-                    functionArguments,
-                    typeof(bool),
-                    _typeMappingSource.FindMapping(typeof(bool)),
-                    true);
+                //return new SqlFunctionExpression(
+                //    functionName,
+                //    functionArguments,
+                //    typeof(bool),
+                //    _typeMappingSource.FindMapping(typeof(bool)),
+                //    true);
             }
 
             return null;

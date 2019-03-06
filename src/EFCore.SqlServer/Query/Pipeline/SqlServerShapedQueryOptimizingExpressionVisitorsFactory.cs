@@ -10,16 +10,19 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
     public class SqlServerShapedQueryOptimizingExpressionVisitorsFactory : RelationalShapedQueryOptimizingExpressionVisitorsFactory
     {
         private readonly IRelationalTypeMappingSource _relationalTypeMapping;
+        private readonly ISqlExpressionFactory _sqlExpressionFactory;
 
         public SqlServerShapedQueryOptimizingExpressionVisitorsFactory(
-            IRelationalTypeMappingSource relationalTypeMapping)
+            IRelationalTypeMappingSource relationalTypeMapping,
+            ISqlExpressionFactory sqlExpressionFactory)
         {
             _relationalTypeMapping = relationalTypeMapping;
+            _sqlExpressionFactory = sqlExpressionFactory;
         }
 
         public override ShapedQueryOptimizingExpressionVisitors Create(QueryCompilationContext2 queryCompilationContext)
         {
-            return new SqlServerShapedQueryOptimizingExpressionVisitors(queryCompilationContext, _relationalTypeMapping);
+            return new SqlServerShapedQueryOptimizingExpressionVisitors(queryCompilationContext, _relationalTypeMapping, _sqlExpressionFactory);
         }
     }
 }

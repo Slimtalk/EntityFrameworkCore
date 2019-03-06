@@ -15,9 +15,8 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
             string functionName,
             bool niladic,
             Type type,
-            RelationalTypeMapping typeMapping,
-            bool condition)
-            : this(null, null, functionName, niladic, null, type, typeMapping, condition)
+            RelationalTypeMapping typeMapping)
+            : this(null, null, functionName, niladic, null, type, typeMapping)
         {
         }
 
@@ -26,9 +25,8 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
             string functionName,
             bool niladic,
             Type type,
-            RelationalTypeMapping typeMapping,
-            bool condition)
-            : this(null, schema, functionName, niladic, null, type, typeMapping, condition)
+            RelationalTypeMapping typeMapping)
+            : this(null, schema, functionName, niladic, null, type, typeMapping)
         {
         }
 
@@ -37,9 +35,8 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
             string functionName,
             bool niladic,
             Type type,
-            RelationalTypeMapping typeMapping,
-            bool condition)
-            : this(instance, null, functionName, niladic, null, type, typeMapping, condition)
+            RelationalTypeMapping typeMapping)
+            : this(instance, null, functionName, niladic, null, type, typeMapping)
         {
         }
 
@@ -47,9 +44,8 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
             string functionName,
             IEnumerable<SqlExpression> arguments,
             Type type,
-            RelationalTypeMapping typeMapping,
-            bool condition)
-            : this(null, null, functionName, false, arguments, type, typeMapping, condition)
+            RelationalTypeMapping typeMapping)
+            : this(null, null, functionName, false, arguments, type, typeMapping)
         {
         }
 
@@ -58,9 +54,8 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
             string functionName,
             IEnumerable<SqlExpression> arguments,
             Type type,
-            RelationalTypeMapping typeMapping,
-            bool condition)
-            : this(null, schema, functionName, false, arguments, type, typeMapping, condition)
+            RelationalTypeMapping typeMapping)
+            : this(null, schema, functionName, false, arguments, type, typeMapping)
         {
         }
 
@@ -69,9 +64,8 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
             string functionName,
             IEnumerable<SqlExpression> arguments,
             Type type,
-            RelationalTypeMapping typeMapping,
-            bool condition)
-            : this(instance, null, functionName, false, arguments, type, typeMapping, condition)
+            RelationalTypeMapping typeMapping)
+            : this(instance, null, functionName, false, arguments, type, typeMapping)
         {
         }
 
@@ -82,28 +76,8 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
             bool niladic,
             IEnumerable<SqlExpression> arguments,
             Type type,
-            RelationalTypeMapping typeMapping,
-            bool condition)
-            : base(type, typeMapping, condition, !condition)
-        {
-            Instance = instance;
-            FunctionName = functionName;
-            Schema = schema;
-            IsNiladic = niladic;
-            Arguments = (arguments ?? Array.Empty<SqlExpression>()).ToList();
-        }
-
-        private SqlFunctionExpression(
-            Expression instance,
-            string schema,
-            string functionName,
-            bool niladic,
-            IEnumerable<SqlExpression> arguments,
-            Type type,
-            RelationalTypeMapping typeMapping,
-            bool condition,
-            bool treatAsValue)
-            : base(type, typeMapping, condition, treatAsValue)
+            RelationalTypeMapping typeMapping)
+            : base(type, typeMapping)
         {
             Instance = instance;
             FunctionName = functionName;
@@ -132,9 +106,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
                     IsNiladic,
                     arguments,
                     Type,
-                    TypeMapping,
-                    IsCondition,
-                    ShouldBeValue)
+                    TypeMapping)
                 : this;
         }
 
@@ -147,23 +119,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
                 IsNiladic,
                 Arguments,
                 Type,
-                typeMapping ?? TypeMapping,
-                IsCondition,
-                ShouldBeValue);
-        }
-
-        public override SqlExpression ConvertToValue(bool treatAsValue)
-        {
-            return new SqlFunctionExpression(
-                Instance,
-                Schema,
-                FunctionName,
-                IsNiladic,
-                Arguments,
-                Type,
-                TypeMapping,
-                IsCondition,
-                treatAsValue);
+                typeMapping ?? TypeMapping);
         }
 
         public string FunctionName { get; }

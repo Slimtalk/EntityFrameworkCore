@@ -62,7 +62,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
 
         private SqlExpression RemoveObjectConvert(SqlExpression expression)
         {
-            if (expression is SqlCastExpression sqlCast
+            if (expression is SqlUnaryExpression sqlCast
                 && sqlCast.Type == typeof(object))
             {
                 return sqlCast.Operand;

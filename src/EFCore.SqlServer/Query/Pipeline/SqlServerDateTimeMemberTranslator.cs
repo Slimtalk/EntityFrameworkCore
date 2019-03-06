@@ -37,85 +37,85 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
         {
             var declaringType = member.DeclaringType;
 
-            if (declaringType == typeof(DateTime)
-                || declaringType == typeof(DateTimeOffset))
-            {
-                var memberName = member.Name;
+            //if (declaringType == typeof(DateTime)
+            //    || declaringType == typeof(DateTimeOffset))
+            //{
+            //    var memberName = member.Name;
 
-                if (_datePartMapping.TryGetValue(memberName, out var datePart))
-                {
-                    return new SqlFunctionExpression(
-                        "DATEPART",
-                        new[]
-                        {
-                            new SqlFragmentExpression(datePart),
-                            instance
-                        },
-                        returnType,
-                        _typeMappingSource.FindMapping(typeof(int)),
-                        false);
-                }
+            //    if (_datePartMapping.TryGetValue(memberName, out var datePart))
+            //    {
+            //        return new SqlFunctionExpression(
+            //            "DATEPART",
+            //            new[]
+            //            {
+            //                new SqlFragmentExpression(datePart),
+            //                instance
+            //            },
+            //            returnType,
+            //            _typeMappingSource.FindMapping(typeof(int)),
+            //            false);
+            //    }
 
-                switch (memberName)
-                {
-                    case nameof(DateTime.Date):
-                        return new SqlFunctionExpression(
-                        "CONVERT",
-                        new[]{
-                                new SqlFragmentExpression("date"),
-                                instance
-                        },
-                        returnType,
-                        instance.TypeMapping,
-                        false);
+            //    switch (memberName)
+            //    {
+            //        case nameof(DateTime.Date):
+            //            return new SqlFunctionExpression(
+            //            "CONVERT",
+            //            new[]{
+            //                    new SqlFragmentExpression("date"),
+            //                    instance
+            //            },
+            //            returnType,
+            //            instance.TypeMapping,
+            //            false);
 
-                    case nameof(DateTime.TimeOfDay):
-                        return new SqlCastExpression(
-                            instance,
-                            returnType,
-                            null);
+            //        case nameof(DateTime.TimeOfDay):
+            //            return new SqlCastExpression(
+            //                instance,
+            //                returnType,
+            //                null);
 
-                    case nameof(DateTime.Now):
-                        return new SqlFunctionExpression(
-                            declaringType == typeof(DateTime) ? "GETDATE" : "SYSDATETIMEOFFSET",
-                            null,
-                            returnType,
-                            _typeMappingSource.FindMapping(returnType),
-                            false);
+            //        case nameof(DateTime.Now):
+            //            return new SqlFunctionExpression(
+            //                declaringType == typeof(DateTime) ? "GETDATE" : "SYSDATETIMEOFFSET",
+            //                null,
+            //                returnType,
+            //                _typeMappingSource.FindMapping(returnType),
+            //                false);
 
-                    case nameof(DateTime.UtcNow):
-                        var serverTranslation = new SqlFunctionExpression(
-                            declaringType == typeof(DateTime) ? "GETUTCDATE" : "SYSUTCDATETIME",
-                            null,
-                            returnType,
-                            _typeMappingSource.FindMapping(returnType),
-                            false);
+            //        case nameof(DateTime.UtcNow):
+            //            var serverTranslation = new SqlFunctionExpression(
+            //                declaringType == typeof(DateTime) ? "GETUTCDATE" : "SYSUTCDATETIME",
+            //                null,
+            //                returnType,
+            //                _typeMappingSource.FindMapping(returnType),
+            //                false);
 
-                        return declaringType == typeof(DateTime)
-                            ? (SqlExpression)serverTranslation
-                            : new SqlCastExpression(
-                                serverTranslation,
-                                returnType,
-                                serverTranslation.TypeMapping);
+            //            return declaringType == typeof(DateTime)
+            //                ? (SqlExpression)serverTranslation
+            //                : new SqlCastExpression(
+            //                    serverTranslation,
+            //                    returnType,
+            //                    serverTranslation.TypeMapping);
 
-                    case nameof(DateTime.Today):
-                        return new SqlFunctionExpression(
-                            "CONVERT",
-                            new SqlExpression[]
-                            {
-                                new SqlFragmentExpression("date"),
-                                new SqlFunctionExpression(
-                                    "GETDATE",
-                                    null,
-                                    typeof(DateTime),
-                                    _typeMappingSource.FindMapping(typeof(DateTime)),
-                                    false)
-                            },
-                            returnType,
-                            _typeMappingSource.FindMapping(returnType),
-                            false);
-                }
-            }
+            //        case nameof(DateTime.Today):
+            //            return new SqlFunctionExpression(
+            //                "CONVERT",
+            //                new SqlExpression[]
+            //                {
+            //                    new SqlFragmentExpression("date"),
+            //                    new SqlFunctionExpression(
+            //                        "GETDATE",
+            //                        null,
+            //                        typeof(DateTime),
+            //                        _typeMappingSource.FindMapping(typeof(DateTime)),
+            //                        false)
+            //                },
+            //                returnType,
+            //                _typeMappingSource.FindMapping(returnType),
+            //                false);
+            //    }
+            //}
 
             return null;
         }

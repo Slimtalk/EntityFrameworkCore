@@ -17,25 +17,30 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
     public class RelationalSqlTranslatingExpressionVisitor : ExpressionVisitor
     {
         private readonly IModel _model;
+        private readonly ISqlExpressionFactory _sqlExpressionFactory;
         private readonly IRelationalTypeMappingSource _typeMappingSource;
         private readonly ITypeMappingApplyingExpressionVisitor _typeMappingApplyingExpressionVisitor;
         private readonly IMemberTranslatorProvider _memberTranslatorProvider;
         private readonly IMethodCallTranslatorProvider _methodCallTranslatorProvider;
+        private readonly SqlTypeMappingVerifyingExpressionVisitor _sqlVerifyingExpressionVisitor;
 
         private SelectExpression _selectExpression;
 
         public RelationalSqlTranslatingExpressionVisitor(
             IModel model,
+            ISqlExpressionFactory sqlExpressionFactory,
             IRelationalTypeMappingSource typeMappingSource,
             ITypeMappingApplyingExpressionVisitor typeMappingApplyingExpressionVisitor,
             IMemberTranslatorProvider memberTranslatorProvider,
             IMethodCallTranslatorProvider methodCallTranslatorProvider)
         {
             _model = model;
+            _sqlExpressionFactory = sqlExpressionFactory;
             _typeMappingSource = typeMappingSource;
             _typeMappingApplyingExpressionVisitor = typeMappingApplyingExpressionVisitor;
             _memberTranslatorProvider = memberTranslatorProvider;
             _methodCallTranslatorProvider = methodCallTranslatorProvider;
+            _sqlVerifyingExpressionVisitor = new SqlTypeMappingVerifyingExpressionVisitor();
         }
 
         public SqlExpression Translate(SelectExpression selectExpression, Expression expression)
@@ -46,7 +51,27 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
 
             _selectExpression = null;
 
-            return _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(translation, _typeMappingSource.FindMapping(expression.Type));
+            translation = _sqlExpressionFactory.ApplyDefaultTypeMapping(translation);
+
+            _sqlVerifyingExpressionVisitor.Visit(translation);
+
+            return translation;
+        }
+
+        private class SqlTypeMappingVerifyingExpressionVisitor : ExpressionVisitor
+        {
+            protected override Expression VisitExtension(Expression node)
+            {
+                if (node is SqlExpression sqlExpression)
+                {
+                    if (sqlExpression.TypeMapping == null)
+                    {
+                        throw new InvalidOperationException("Null TypeMapping in Sql Tree");
+                    }
+                }
+
+                return base.VisitExtension(node);
+            }
         }
 
         protected override Expression VisitMember(MemberExpression memberExpression)
@@ -126,14 +151,11 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
                     _methodCallTranslatorProvider.Translate(_model, null, binaryExpression.Method, new[] { left, right }), null);
             }
 
-            var newExpression = new SqlBinaryExpression(
+            return _sqlExpressionFactory.MakeBinary(
                 binaryExpression.NodeType,
                 left,
                 right,
-                binaryExpression.Type,
                 null);
-
-            return _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(newExpression, null);
         }
 
         protected override Expression VisitConstant(ConstantExpression constantExpression)
@@ -172,14 +194,12 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
                 return null;
             }
 
-            var newExpression = new CaseExpression(
-                new List<CaseWhenClause>
+            return _sqlExpressionFactory.Case(
+                new []
                 {
                     new CaseWhenClause(test, ifTrue)
                 },
                 ifFalse);
-
-            return _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(newExpression, null);
         }
 
         //protected override Expression VisitNew(NewExpression newExpression)
@@ -236,13 +256,9 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
                     return sqlOperand;
                 }
 
-                sqlOperand = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                        sqlOperand, _typeMappingSource.FindMapping(sqlOperand.Type));
+                sqlOperand = _sqlExpressionFactory.ApplyDefaultTypeMapping(sqlOperand);
 
-                return new SqlCastExpression(
-                    sqlOperand,
-                    unaryExpression.Type,
-                    null);
+                return _sqlExpressionFactory.Convert(sqlOperand, unaryExpression.Type, null);
             }
 
             if (unaryExpression.NodeType == ExpressionType.Not)

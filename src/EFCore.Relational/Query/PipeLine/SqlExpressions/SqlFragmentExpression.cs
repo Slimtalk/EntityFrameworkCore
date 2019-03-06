@@ -8,17 +8,12 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
     public class SqlFragmentExpression : SqlExpression
     {
         public SqlFragmentExpression(string sql)
-            : base(typeof(string), null, false, true)
+            : base(typeof(string), null)
         {
             Sql = sql;
         }
 
         protected override Expression VisitChildren(ExpressionVisitor visitor)
-        {
-            return this;
-        }
-
-        public override SqlExpression ConvertToValue(bool treatAsValue)
         {
             return this;
         }

@@ -29,18 +29,18 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType)
         {
-            if (_memberToFunctionName.TryGetValue(member.OnInterface(typeof(IPoint)), out var functionName))
-            {
-                return new SqlFunctionExpression(
-                    functionName,
-                    new[]
-                    {
-                        instance
-                    },
-                    returnType,
-                    _typeMappingSource.FindMapping(returnType),
-                    false);
-            }
+            //if (_memberToFunctionName.TryGetValue(member.OnInterface(typeof(IPoint)), out var functionName))
+            //{
+            //    return new SqlFunctionExpression(
+            //        functionName,
+            //        new[]
+            //        {
+            //            instance
+            //        },
+            //        returnType,
+            //        _typeMappingSource.FindMapping(returnType),
+            //        false);
+            //}
 
             return null;
         }

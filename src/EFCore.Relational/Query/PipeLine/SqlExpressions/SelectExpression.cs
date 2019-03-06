@@ -403,6 +403,32 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
             return IsDistinct == selectExpression.IsDistinct;
         }
 
+        public SelectExpression Update(
+            List<ProjectionExpression> projections,
+            List<TableExpressionBase> tables,
+            SqlExpression predicate,
+            List<OrderingExpression> orderings,
+            SqlExpression limit,
+            SqlExpression offset,
+            bool distinct,
+            string alias)
+        {
+            var projectionMapping = new Dictionary<ProjectionMember, Expression>();
+            foreach (var kvp in _projectionMapping)
+            {
+                projectionMapping[kvp.Key] = kvp.Value;
+            }
+
+            return new SelectExpression(alias, projectionMapping, projections, tables)
+            {
+                Predicate = predicate,
+                _orderings = orderings,
+                Offset = offset,
+                Limit = limit,
+                IsDistinct = distinct
+            };
+        }
+
         public override int GetHashCode()
         {
             unchecked

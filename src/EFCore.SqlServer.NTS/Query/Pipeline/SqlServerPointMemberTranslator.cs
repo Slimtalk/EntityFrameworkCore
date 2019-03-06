@@ -41,27 +41,28 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType)
         {
-            if (typeof(IPoint).IsAssignableFrom(member.DeclaringType))
-            {
-                Debug.Assert(instance.TypeMapping != null, "Instance must have typeMapping assigned.");
-                var storeType = instance.TypeMapping.StoreType;
-                var isGeography = string.Equals(storeType, "geography", StringComparison.OrdinalIgnoreCase);
+            //if (typeof(IPoint).IsAssignableFrom(member.DeclaringType))
+            //{
+            //    Debug.Assert(instance.TypeMapping != null, "Instance must have typeMapping assigned.");
+            //    var storeType = instance.TypeMapping.StoreType;
+            //    var isGeography = string.Equals(storeType, "geography", StringComparison.OrdinalIgnoreCase);
 
-                member = member.OnInterface(typeof(IPoint));
-                if (_memberToPropertyName.TryGetValue(member, out var propertyName)
-                    || (isGeography
-                        ? _geographyMemberToPropertyName.TryGetValue(member, out propertyName)
-                        : _geometryMemberToPropertyName.TryGetValue(member, out propertyName)))
-                {
-                    return new SqlFunctionExpression(
-                        instance,
-                        propertyName,
-                        niladic: true,
-                        returnType,
-                        _typeMappingSource.FindMapping(returnType),
-                        false);
-                }
-            }
+            //    member = member.OnInterface(typeof(IPoint));
+            //    if (_memberToPropertyName.TryGetValue(member, out var propertyName)
+            //        || (isGeography
+            //            ? _geographyMemberToPropertyName.TryGetValue(member, out propertyName)
+            //            : _geometryMemberToPropertyName.TryGetValue(member, out propertyName)))
+            //    {
+            //        return new SqlFunctionExpression(
+            //            instance,
+            //            propertyName,
+            //            niladic: true,
+            //            returnType,
+            //            _typeMappingSource.FindMapping(returnType),
+            //            false);
+            //    }
+            //}
+
             return null;
         }
     }

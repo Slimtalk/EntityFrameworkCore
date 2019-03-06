@@ -9,14 +9,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
     public class ExistsExpression : SqlExpression
     {
         public ExistsExpression(SelectExpression subquery, bool negated, RelationalTypeMapping typeMapping)
-            : base(typeof(bool), typeMapping, true, false)
-        {
-            Subquery = subquery;
-            Negated = negated;
-        }
-
-        private ExistsExpression(SelectExpression subquery, bool negated, RelationalTypeMapping typeMapping, bool treatAsValue)
-            : base(typeof(bool), typeMapping, true, treatAsValue)
+            : base(typeof(bool), typeMapping)
         {
             Subquery = subquery;
             Negated = negated;
@@ -27,13 +20,8 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
             var newSubquery = (SelectExpression)visitor.Visit(Subquery);
 
             return newSubquery != Subquery
-                ? new ExistsExpression(newSubquery, Negated, TypeMapping, ShouldBeValue)
+                ? new ExistsExpression(newSubquery, Negated, TypeMapping)
                 : this;
-        }
-
-        public override SqlExpression ConvertToValue(bool treatAsValue)
-        {
-            return new ExistsExpression(Subquery, Negated, TypeMapping, treatAsValue);
         }
 
         public SelectExpression Subquery { get; }

@@ -345,7 +345,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
             return caseExpression;
         }
 
-        protected override Expression VisitSqlCast(SqlCastExpression sqlCastExpression)
+        protected override Expression VisitSqlUnary(SqlUnaryExpression sqlCastExpression)
         {
             _relationalCommandBuilder.Append("CAST(");
             Visit(sqlCastExpression.Operand);

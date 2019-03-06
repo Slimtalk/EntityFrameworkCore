@@ -35,59 +35,59 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType)
         {
-            if (typeof(IPolygon).IsAssignableFrom(member.DeclaringType))
-            {
-                member = member.OnInterface(typeof(IPolygon));
-                Debug.Assert(instance.TypeMapping != null, "Instance must have typeMapping assigned.");
-                var storeType = instance.TypeMapping.StoreType;
-                var isGeography = string.Equals(storeType, "geography", StringComparison.OrdinalIgnoreCase);
+            //if (typeof(IPolygon).IsAssignableFrom(member.DeclaringType))
+            //{
+            //    member = member.OnInterface(typeof(IPolygon));
+            //    Debug.Assert(instance.TypeMapping != null, "Instance must have typeMapping assigned.");
+            //    var storeType = instance.TypeMapping.StoreType;
+            //    var isGeography = string.Equals(storeType, "geography", StringComparison.OrdinalIgnoreCase);
 
-                if (isGeography)
-                {
-                    var constantExpression = new SqlConstantExpression(Expression.Constant(1), _intTypeMapping);
-                    if (Equals(_exteriorRing, member))
-                    {
-                        return new SqlFunctionExpression(
-                            instance,
-                            "RingN",
-                            new[] { constantExpression },
-                            returnType,
-                            _typeMappingSource.FindMapping(returnType, storeType),
-                            false);
-                    }
+            //    if (isGeography)
+            //    {
+            //        var constantExpression = new SqlConstantExpression(Expression.Constant(1), _intTypeMapping);
+            //        if (Equals(_exteriorRing, member))
+            //        {
+            //            return new SqlFunctionExpression(
+            //                instance,
+            //                "RingN",
+            //                new[] { constantExpression },
+            //                returnType,
+            //                _typeMappingSource.FindMapping(returnType, storeType),
+            //                false);
+            //        }
 
-                    if (Equals(_numInteriorRings, member))
-                    {
-                        return new SqlBinaryExpression(
-                            ExpressionType.Subtract,
-                            new SqlFunctionExpression(
-                                instance,
-                                "NumRings",
-                                null,
-                                returnType,
-                                _intTypeMapping,
-                                false),
-                            constantExpression,
-                            returnType,
-                            _intTypeMapping);
-                    }
-                }
+            //        if (Equals(_numInteriorRings, member))
+            //        {
+            //            return new SqlBinaryExpression(
+            //                ExpressionType.Subtract,
+            //                new SqlFunctionExpression(
+            //                    instance,
+            //                    "NumRings",
+            //                    null,
+            //                    returnType,
+            //                    _intTypeMapping,
+            //                    false),
+            //                constantExpression,
+            //                returnType,
+            //                _intTypeMapping);
+            //        }
+            //    }
 
-                if (_geometryMemberToFunctionName.TryGetValue(member, out var functionName))
-                {
-                    var resultTypeMapping = typeof(IGeometry).IsAssignableFrom(returnType)
-                        ? _typeMappingSource.FindMapping(returnType, storeType)
-                        : _typeMappingSource.FindMapping(returnType);
+            //    if (_geometryMemberToFunctionName.TryGetValue(member, out var functionName))
+            //    {
+            //        var resultTypeMapping = typeof(IGeometry).IsAssignableFrom(returnType)
+            //            ? _typeMappingSource.FindMapping(returnType, storeType)
+            //            : _typeMappingSource.FindMapping(returnType);
 
-                    return new SqlFunctionExpression(
-                        instance,
-                        functionName,
-                        null,
-                        returnType,
-                        resultTypeMapping,
-                        false);
-                }
-            }
+            //        return new SqlFunctionExpression(
+            //            instance,
+            //            functionName,
+            //            null,
+            //            returnType,
+            //            resultTypeMapping,
+            //            false);
+            //    }
+            //}
 
             return null;
         }

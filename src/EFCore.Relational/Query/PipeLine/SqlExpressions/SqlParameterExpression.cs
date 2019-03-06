@@ -12,14 +12,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
         private readonly ParameterExpression _parameterExpression;
 
         public SqlParameterExpression(ParameterExpression parameterExpression, RelationalTypeMapping typeMapping)
-            : base(parameterExpression.Type, typeMapping, false, true)
-        {
-            _parameterExpression = parameterExpression;
-        }
-
-        private SqlParameterExpression(
-            ParameterExpression parameterExpression, RelationalTypeMapping typeMapping, bool treatAsValue)
-            : base(parameterExpression.Type, typeMapping, false, treatAsValue)
+            : base(parameterExpression.Type, typeMapping)
         {
             _parameterExpression = parameterExpression;
         }
@@ -32,11 +25,6 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
         protected override Expression VisitChildren(ExpressionVisitor visitor)
         {
             return this;
-        }
-
-        public override SqlExpression ConvertToValue(bool treatAsValue)
-        {
-            return new SqlParameterExpression(_parameterExpression, TypeMapping, treatAsValue);
         }
 
         public string Name => _parameterExpression.Name;

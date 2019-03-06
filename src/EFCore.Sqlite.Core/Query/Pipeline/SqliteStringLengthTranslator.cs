@@ -20,15 +20,16 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType)
         {
-            return instance.Type == typeof(string)
-                   && member.Name == nameof(string.Length)
-                   ? new SqlFunctionExpression(
-                       "length",
-                       new[] { instance },
-                       returnType,
-                       _typeMappingSource.FindMapping(returnType),
-                       false)
-                    : null;
+            return null;
+            //return instance.Type == typeof(string)
+            //       && member.Name == nameof(string.Length)
+            //       ? new SqlFunctionExpression(
+            //           "length",
+            //           new[] { instance },
+            //           returnType,
+            //           _typeMappingSource.FindMapping(returnType),
+            //           false)
+            //        : null;
         }
     }
 }

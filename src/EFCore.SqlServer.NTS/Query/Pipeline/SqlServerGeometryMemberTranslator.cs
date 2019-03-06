@@ -49,75 +49,75 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType)
         {
-            if (typeof(IGeometry).IsAssignableFrom(member.DeclaringType))
-            {
-                Debug.Assert(instance.TypeMapping != null, "Instance must have typeMapping assigned.");
-                var storeType = instance.TypeMapping.StoreType;
-                var isGeography = string.Equals(storeType, "geography", StringComparison.OrdinalIgnoreCase);
+            //if (typeof(IGeometry).IsAssignableFrom(member.DeclaringType))
+            //{
+            //    Debug.Assert(instance.TypeMapping != null, "Instance must have typeMapping assigned.");
+            //    var storeType = instance.TypeMapping.StoreType;
+            //    var isGeography = string.Equals(storeType, "geography", StringComparison.OrdinalIgnoreCase);
 
-                member = member.OnInterface(typeof(IGeometry));
-                if (_memberToFunctionName.TryGetValue(member, out var functionName)
-                    || (!isGeography && _geometryMemberToFunctionName.TryGetValue(member, out functionName)))
-                {
-                    var resultTypeMapping = typeof(IGeometry).IsAssignableFrom(returnType)
-                        ? _typeMappingSource.FindMapping(returnType, storeType)
-                        : _typeMappingSource.FindMapping(returnType);
+            //    member = member.OnInterface(typeof(IGeometry));
+            //    if (_memberToFunctionName.TryGetValue(member, out var functionName)
+            //        || (!isGeography && _geometryMemberToFunctionName.TryGetValue(member, out functionName)))
+            //    {
+            //        var resultTypeMapping = typeof(IGeometry).IsAssignableFrom(returnType)
+            //            ? _typeMappingSource.FindMapping(returnType, storeType)
+            //            : _typeMappingSource.FindMapping(returnType);
 
-                    return new SqlFunctionExpression(
-                        instance,
-                        functionName,
-                        null,
-                        returnType,
-                        resultTypeMapping,
-                        false);
-                }
+            //        return new SqlFunctionExpression(
+            //            instance,
+            //            functionName,
+            //            null,
+            //            returnType,
+            //            resultTypeMapping,
+            //            false);
+            //    }
 
-                if (Equals(member, _ogcGeometryType))
-                {
-                    var stringTypeMapping = _typeMappingSource.FindMapping(typeof(string));
-                    var resultTypeMapping = _typeMappingSource.FindMapping(returnType);
+            //    if (Equals(member, _ogcGeometryType))
+            //    {
+            //        var stringTypeMapping = _typeMappingSource.FindMapping(typeof(string));
+            //        var resultTypeMapping = _typeMappingSource.FindMapping(returnType);
 
-                    var whenClauses = new List<CaseWhenClause>
-                    {
-                        new CaseWhenClause(MakeSqlConstant("Point", stringTypeMapping), MakeSqlConstant(OgcGeometryType.Point, resultTypeMapping)),
-                        new CaseWhenClause(MakeSqlConstant("LineString", stringTypeMapping), MakeSqlConstant(OgcGeometryType.LineString, resultTypeMapping)),
-                        new CaseWhenClause(MakeSqlConstant("Polygon", stringTypeMapping), MakeSqlConstant(OgcGeometryType.Polygon, resultTypeMapping)),
-                        new CaseWhenClause(MakeSqlConstant("MultiPoint", stringTypeMapping), MakeSqlConstant(OgcGeometryType.MultiPoint, resultTypeMapping)),
-                        new CaseWhenClause(MakeSqlConstant("MultiLineString", stringTypeMapping), MakeSqlConstant(OgcGeometryType.MultiLineString, resultTypeMapping)),
-                        new CaseWhenClause(MakeSqlConstant("MultiPolygon", stringTypeMapping), MakeSqlConstant(OgcGeometryType.MultiPolygon, resultTypeMapping)),
-                        new CaseWhenClause(MakeSqlConstant("GeometryCollection", stringTypeMapping), MakeSqlConstant(OgcGeometryType.GeometryCollection, resultTypeMapping)),
-                        new CaseWhenClause(MakeSqlConstant("CircularString", stringTypeMapping), MakeSqlConstant(OgcGeometryType.CircularString, resultTypeMapping)),
-                        new CaseWhenClause(MakeSqlConstant("CompoundCurve", stringTypeMapping), MakeSqlConstant(OgcGeometryType.CompoundCurve, resultTypeMapping)),
-                        new CaseWhenClause(MakeSqlConstant("CurvePolygon", stringTypeMapping), MakeSqlConstant(OgcGeometryType.CurvePolygon, resultTypeMapping))
-                    };
+            //        var whenClauses = new List<CaseWhenClause>
+            //        {
+            //            new CaseWhenClause(MakeSqlConstant("Point", stringTypeMapping), MakeSqlConstant(OgcGeometryType.Point, resultTypeMapping)),
+            //            new CaseWhenClause(MakeSqlConstant("LineString", stringTypeMapping), MakeSqlConstant(OgcGeometryType.LineString, resultTypeMapping)),
+            //            new CaseWhenClause(MakeSqlConstant("Polygon", stringTypeMapping), MakeSqlConstant(OgcGeometryType.Polygon, resultTypeMapping)),
+            //            new CaseWhenClause(MakeSqlConstant("MultiPoint", stringTypeMapping), MakeSqlConstant(OgcGeometryType.MultiPoint, resultTypeMapping)),
+            //            new CaseWhenClause(MakeSqlConstant("MultiLineString", stringTypeMapping), MakeSqlConstant(OgcGeometryType.MultiLineString, resultTypeMapping)),
+            //            new CaseWhenClause(MakeSqlConstant("MultiPolygon", stringTypeMapping), MakeSqlConstant(OgcGeometryType.MultiPolygon, resultTypeMapping)),
+            //            new CaseWhenClause(MakeSqlConstant("GeometryCollection", stringTypeMapping), MakeSqlConstant(OgcGeometryType.GeometryCollection, resultTypeMapping)),
+            //            new CaseWhenClause(MakeSqlConstant("CircularString", stringTypeMapping), MakeSqlConstant(OgcGeometryType.CircularString, resultTypeMapping)),
+            //            new CaseWhenClause(MakeSqlConstant("CompoundCurve", stringTypeMapping), MakeSqlConstant(OgcGeometryType.CompoundCurve, resultTypeMapping)),
+            //            new CaseWhenClause(MakeSqlConstant("CurvePolygon", stringTypeMapping), MakeSqlConstant(OgcGeometryType.CurvePolygon, resultTypeMapping))
+            //        };
 
-                    if (isGeography)
-                    {
-                        whenClauses.Add(new CaseWhenClause(MakeSqlConstant("FullGlobe", stringTypeMapping), MakeSqlConstant((OgcGeometryType)126, resultTypeMapping)));
-                    }
+            //        if (isGeography)
+            //        {
+            //            whenClauses.Add(new CaseWhenClause(MakeSqlConstant("FullGlobe", stringTypeMapping), MakeSqlConstant((OgcGeometryType)126, resultTypeMapping)));
+            //        }
 
-                    return new CaseExpression(
-                        new SqlFunctionExpression(
-                            instance,
-                            "STGeometryType",
-                            null,
-                            returnType,
-                            resultTypeMapping,
-                            false),
-                        whenClauses.ToArray());
-                }
+            //        return new CaseExpression(
+            //            new SqlFunctionExpression(
+            //                instance,
+            //                "STGeometryType",
+            //                null,
+            //                returnType,
+            //                resultTypeMapping,
+            //                false),
+            //            whenClauses.ToArray());
+            //    }
 
-                if (Equals(member, _srid))
-                {
-                    return new SqlFunctionExpression(
-                        instance,
-                        "STSrid",
-                        niladic: true,
-                        returnType,
-                        _typeMappingSource.FindMapping(returnType),
-                        false);
-                }
-            }
+            //    if (Equals(member, _srid))
+            //    {
+            //        return new SqlFunctionExpression(
+            //            instance,
+            //            "STSrid",
+            //            niladic: true,
+            //            returnType,
+            //            _typeMappingSource.FindMapping(returnType),
+            //            false);
+            //    }
+            //}
 
             return null;
         }

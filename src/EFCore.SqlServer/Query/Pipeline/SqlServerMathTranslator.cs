@@ -78,64 +78,64 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MethodInfo method, IList<SqlExpression> arguments)
         {
-            if (_supportedMethodTranslations.TryGetValue(method, out var sqlFunctionName))
-            {
-                var typeMapping = (arguments.Count == 1
-                    ? ExpressionExtensions.InferTypeMapping(arguments[0])
-                    : ExpressionExtensions.InferTypeMapping(arguments[0], arguments[1]))
-                    ?? _typeMappingSource.FindMapping(arguments[0].Type);
+            //if (_supportedMethodTranslations.TryGetValue(method, out var sqlFunctionName))
+            //{
+            //    var typeMapping = (arguments.Count == 1
+            //        ? ExpressionExtensions.InferTypeMapping(arguments[0])
+            //        : ExpressionExtensions.InferTypeMapping(arguments[0], arguments[1]))
+            //        ?? _typeMappingSource.FindMapping(arguments[0].Type);
 
-                var newArguments = new SqlExpression[arguments.Count];
-                newArguments[0] = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(arguments[0], typeMapping);
+            //    var newArguments = new SqlExpression[arguments.Count];
+            //    newArguments[0] = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(arguments[0], typeMapping);
 
-                if (arguments.Count == 2)
-                {
-                    newArguments[1] = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(arguments[1], typeMapping);
-                }
+            //    if (arguments.Count == 2)
+            //    {
+            //        newArguments[1] = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(arguments[1], typeMapping);
+            //    }
 
-                return new SqlFunctionExpression(
-                    sqlFunctionName,
-                    newArguments,
-                    method.ReturnType,
-                    sqlFunctionName == "SIGN" ? _intTypeMapping : typeMapping,
-                    false);
-            }
+            //    return new SqlFunctionExpression(
+            //        sqlFunctionName,
+            //        newArguments,
+            //        method.ReturnType,
+            //        sqlFunctionName == "SIGN" ? _intTypeMapping : typeMapping,
+            //        false);
+            //}
 
-            if (_truncateMethodInfos.Contains(method))
-            {
-                var argument = arguments[0];
-                var typeMapping = ExpressionExtensions.InferTypeMapping(argument) ?? _typeMappingSource.FindMapping(arguments[0].Type);
-                argument = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(argument, typeMapping);
+            //if (_truncateMethodInfos.Contains(method))
+            //{
+            //    var argument = arguments[0];
+            //    var typeMapping = ExpressionExtensions.InferTypeMapping(argument) ?? _typeMappingSource.FindMapping(arguments[0].Type);
+            //    argument = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(argument, typeMapping);
 
-                return new SqlFunctionExpression(
-                    "ROUND",
-                    new[] {
-                            argument,
-                            MakeSqlConstant(0),
-                            MakeSqlConstant(1)
-                    },
-                    method.ReturnType,
-                    typeMapping,
-                    false);
-            }
+            //    return new SqlFunctionExpression(
+            //        "ROUND",
+            //        new[] {
+            //                argument,
+            //                MakeSqlConstant(0),
+            //                MakeSqlConstant(1)
+            //        },
+            //        method.ReturnType,
+            //        typeMapping,
+            //        false);
+            //}
 
-            if (_roundMethodInfos.Contains(method))
-            {
-                var argument = arguments[0];
-                var typeMapping = ExpressionExtensions.InferTypeMapping(argument) ?? _typeMappingSource.FindMapping(arguments[0].Type);
-                argument = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(argument, typeMapping);
+            //if (_roundMethodInfos.Contains(method))
+            //{
+            //    var argument = arguments[0];
+            //    var typeMapping = ExpressionExtensions.InferTypeMapping(argument) ?? _typeMappingSource.FindMapping(arguments[0].Type);
+            //    argument = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(argument, typeMapping);
 
-                var digits = arguments.Count == 2
-                    ? _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(arguments[1], _intTypeMapping)
-                    : MakeSqlConstant(0);
+            //    var digits = arguments.Count == 2
+            //        ? _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(arguments[1], _intTypeMapping)
+            //        : MakeSqlConstant(0);
 
-                return new SqlFunctionExpression(
-                    "ROUND",
-                    new[] { argument, digits },
-                    method.ReturnType,
-                    typeMapping,
-                    false);
-            }
+            //    return new SqlFunctionExpression(
+            //        "ROUND",
+            //        new[] { argument, digits },
+            //        method.ReturnType,
+            //        typeMapping,
+            //        false);
+            //}
 
             return null;
         }

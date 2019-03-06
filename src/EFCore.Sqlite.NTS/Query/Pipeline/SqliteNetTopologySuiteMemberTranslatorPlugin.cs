@@ -21,12 +21,14 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
     /// </summary>
     public class SqliteNetTopologySuiteMemberTranslatorPlugin : IMemberTranslatorPlugin
     {
-        public SqliteNetTopologySuiteMemberTranslatorPlugin(IRelationalTypeMappingSource typeMappingSource)
+        public SqliteNetTopologySuiteMemberTranslatorPlugin(
+            ISqlExpressionFactory sqlExpressionFactory,
+            IRelationalTypeMappingSource typeMappingSource)
         {
             Translators = new IMemberTranslator[]
             {
                 new SqliteCurveMemberTranslator(typeMappingSource),
-                new SqliteGeometryMemberTranslator(typeMappingSource),
+                new SqliteGeometryMemberTranslator(sqlExpressionFactory),
                 new SqliteGeometryCollectionMemberTranslator(typeMappingSource),
                 new SqliteLineStringMemberTranslator(typeMappingSource),
                 new SqliteMultiCurveMemberTranslator(typeMappingSource),

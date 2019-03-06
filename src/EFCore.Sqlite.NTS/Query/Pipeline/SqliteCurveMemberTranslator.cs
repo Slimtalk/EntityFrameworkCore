@@ -39,8 +39,7 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
                         instance
                     },
                     returnType,
-                    _typeMappingSource.FindMapping(returnType),
-                    false);
+                    _typeMappingSource.FindMapping(returnType));
 
                 if (returnType == typeof(bool))
                 {

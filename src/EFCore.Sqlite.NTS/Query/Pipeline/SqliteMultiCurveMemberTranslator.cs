@@ -22,21 +22,21 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType)
         {
-            if (Equals(member.OnInterface(typeof(IMultiCurve)), _isClosed))
-            {
-                return new CaseExpression(
-                    new[] {
-                        new CaseWhenClause(
-                            new SqlNullExpression(instance, true, _typeMappingSource.FindMapping(typeof(bool))),
-                            new SqlFunctionExpression(
-                                "IsClosed",
-                                new[] { instance },
-                                returnType,
-                                _typeMappingSource.FindMapping(returnType),
-                                false))
-                    },
-                    null);
-            }
+            //if (Equals(member.OnInterface(typeof(IMultiCurve)), _isClosed))
+            //{
+            //    return new CaseExpression(
+            //        new[] {
+            //            new CaseWhenClause(
+            //                new SqlNullExpression(instance, true, _typeMappingSource.FindMapping(typeof(bool))),
+            //                new SqlFunctionExpression(
+            //                    "IsClosed",
+            //                    new[] { instance },
+            //                    returnType,
+            //                    _typeMappingSource.FindMapping(returnType),
+            //                    false))
+            //        },
+            //        null);
+            //}
 
             return null;
         }

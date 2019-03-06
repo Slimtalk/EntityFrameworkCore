@@ -17,10 +17,12 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
     {
         private readonly RelationalSqlTranslatingExpressionVisitor _sqlTranslator;
         private readonly RelationalProjectionBindingExpressionVisitor _projectionBindingExpressionVisitor;
+        private readonly ISqlExpressionFactory _sqlExpressionFactory;
         private readonly IRelationalTypeMappingSource _typeMappingSource;
 
         public RelationalQueryableMethodTranslatingExpressionVisitor(
             IModel model,
+            ISqlExpressionFactory sqlExpressionFactory,
             IRelationalTypeMappingSource typeMappingSource,
             ITypeMappingApplyingExpressionVisitor typeMappingApplyingExpressionVisitor,
             IMemberTranslatorProvider memberTranslatorProvider,
@@ -28,18 +30,20 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
         {
             _sqlTranslator = new RelationalSqlTranslatingExpressionVisitor(
                 model,
+                sqlExpressionFactory,
                 typeMappingSource,
                 typeMappingApplyingExpressionVisitor,
                 memberTranslatorProvider,
                 methodCallTranslatorProvider);
 
             _projectionBindingExpressionVisitor = new RelationalProjectionBindingExpressionVisitor(_sqlTranslator);
+            _sqlExpressionFactory = sqlExpressionFactory;
             _typeMappingSource = typeMappingSource;
         }
 
         protected override ShapedQueryExpression TranslateAll(ShapedQueryExpression source, LambdaExpression predicate)
         {
-            var translation = TranslateLambdaExpression(source, predicate, true);
+            var translation = TranslateLambdaExpression(source, predicate);
 
             if (translation != null)
             {
@@ -59,8 +63,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
                 translation = new ExistsExpression(
                     selectExpression,
                     true,
-                    _typeMappingSource.FindMapping(typeof(bool)))
-                        .ConvertToValue(true);
+                    _typeMappingSource.FindMapping(typeof(bool)));
 
                 var projectionMapping = new Dictionary<ProjectionMember, Expression>
                 {
@@ -104,8 +107,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
             var translation = new ExistsExpression(
                 selectExpression,
                 false,
-                _typeMappingSource.FindMapping(typeof(bool)))
-                    .ConvertToValue(true);
+                _typeMappingSource.FindMapping(typeof(bool)));
 
             var projectionMapping = new Dictionary<ProjectionMember, Expression>
             {
@@ -140,35 +142,22 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
             if (inputType == typeof(int)
                 || inputType == typeof(long))
             {
-                projection = new SqlCastExpression(projection, typeof(double), _typeMappingSource.FindMapping(typeof(double)));
+                projection = _sqlExpressionFactory.Convert(
+                    projection, typeof(double), _typeMappingSource.FindMapping(typeof(double)));
             }
 
             if (projection.Type.UnwrapNullableType() == typeof(float))
             {
-                projection = new SqlCastExpression(
-                    new SqlFunctionExpression(
-                        "AVG",
-                        new[]
-                        {
-                            projection
-                        },
-                        typeof(double),
-                        _typeMappingSource.FindMapping(typeof(double)),
-                        false),
-                    projection.Type,
-                    projection.TypeMapping);
+                projection = _sqlExpressionFactory.Convert(
+                        _sqlExpressionFactory.SqlFunction(
+                            "AVG", new[] { projection }, typeof(double), _typeMappingSource.FindMapping(typeof(double))),
+                        projection.Type,
+                        projection.TypeMapping);
             }
             else
             {
-                projection = new SqlFunctionExpression(
-                    "AVG",
-                    new[]
-                    {
-                        projection
-                    },
-                    projection.Type,
-                    projection.TypeMapping,
-                    false);
+                projection = _sqlExpressionFactory.SqlFunction(
+                    "AVG", new[] { projection }, projection.Type, projection.TypeMapping);
             }
 
             return AggregateResultShaper(source, projection, throwOnNullResult: true, resultType);
@@ -189,7 +178,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
         protected override ShapedQueryExpression TranslateContains(ShapedQueryExpression source, Expression item)
         {
             var selectExpression = (SelectExpression)source.QueryExpression;
-            var translation = TranslateExpression(selectExpression, item, false);
+            var translation = TranslateExpression(selectExpression, item);
 
             if (translation != null)
             {
@@ -205,8 +194,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
                     translation,
                     false,
                     selectExpression,
-                    _typeMappingSource.FindMapping(typeof(bool)))
-                        .ConvertToValue(true);
+                    _typeMappingSource.FindMapping(typeof(bool)));
 
                 var projectionMapping = new Dictionary<ProjectionMember, Expression>
                 {
@@ -227,7 +215,6 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
 
                 return source;
             }
-
 
             throw new NotImplementedException();
         }
@@ -255,8 +242,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
                         new SqlFragmentExpression("*")
                     },
                     typeof(int),
-                    _typeMappingSource.FindMapping(typeof(int)),
-                    false);
+                    _typeMappingSource.FindMapping(typeof(int)));
 
             var _projectionMapping = new Dictionary<ProjectionMember, Expression>
             {
@@ -356,8 +342,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
                     projection
                 },
                 resultType,
-                projection.TypeMapping,
-                false);
+                projection.TypeMapping);
 
             return AggregateResultShaper(source, projection, throwOnNullResult: true, resultType);
         }
@@ -379,8 +364,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
                     projection
                 },
                 resultType,
-                projection.TypeMapping,
-                false);
+                projection.TypeMapping);
 
             return AggregateResultShaper(source, projection, throwOnNullResult: true, resultType);
         }
@@ -395,7 +379,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
                 selectExpression.PushdownIntoSubQuery();
             }
 
-            var translation = TranslateLambdaExpression(source, keySelector, false);
+            var translation = TranslateLambdaExpression(source, keySelector);
 
             if (translation != null)
             {
@@ -455,7 +439,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
         protected override ShapedQueryExpression TranslateSkip(ShapedQueryExpression source, Expression count)
         {
             var selectExpression = (SelectExpression)source.QueryExpression;
-            var translation = TranslateExpression(selectExpression, count, false);
+            var translation = TranslateExpression(selectExpression, count);
 
             if (translation != null)
             {
@@ -482,30 +466,16 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
 
             if (serverOutputType == typeof(float))
             {
-                projection = new SqlCastExpression(
-                    new SqlFunctionExpression(
-                        "SUM",
-                        new[]
-                        {
-                            projection
-                        },
-                        typeof(double),
-                        _typeMappingSource.FindMapping(typeof(double)),
-                        false),
-                    serverOutputType,
-                    projection.TypeMapping);
+                projection = _sqlExpressionFactory.Convert(
+                        _sqlExpressionFactory.SqlFunction(
+                            "SUM", new[] { projection }, typeof(double), _typeMappingSource.FindMapping(typeof(double))),
+                        serverOutputType,
+                        projection.TypeMapping);
             }
             else
             {
-                projection = new SqlFunctionExpression(
-                    "SUM",
-                    new[]
-                    {
-                        projection
-                    },
-                    serverOutputType,
-                    projection.TypeMapping,
-                    false);
+                projection = _sqlExpressionFactory.SqlFunction(
+                    "SUM", new[] { projection }, serverOutputType, projection.TypeMapping);
             }
 
             return AggregateResultShaper(source, projection, throwOnNullResult: false, resultType);
@@ -514,7 +484,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
         protected override ShapedQueryExpression TranslateTake(ShapedQueryExpression source, Expression count)
         {
             var selectExpression = (SelectExpression)source.QueryExpression;
-            var translation = TranslateExpression(selectExpression, count, false);
+            var translation = TranslateExpression(selectExpression, count);
 
             if (translation != null)
             {
@@ -530,7 +500,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
 
         protected override ShapedQueryExpression TranslateThenBy(ShapedQueryExpression source, LambdaExpression keySelector, bool ascending)
         {
-            var translation = TranslateLambdaExpression(source, keySelector, false);
+            var translation = TranslateLambdaExpression(source, keySelector);
 
             if (translation != null)
             {
@@ -546,7 +516,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
 
         protected override ShapedQueryExpression TranslateWhere(ShapedQueryExpression source, LambdaExpression predicate)
         {
-            var translation = TranslateLambdaExpression(source, predicate, true);
+            var translation = TranslateLambdaExpression(source, predicate);
 
             if (translation != null)
             {
@@ -558,13 +528,13 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
             throw new InvalidOperationException();
         }
 
-        private SqlExpression TranslateExpression(SelectExpression selectExpression, Expression expression, bool condition)
+        private SqlExpression TranslateExpression(SelectExpression selectExpression, Expression expression)
         {
-            return _sqlTranslator.Translate(selectExpression, expression)?.ConvertToValue(!condition);
+            return _sqlTranslator.Translate(selectExpression, expression);
         }
 
         private SqlExpression TranslateLambdaExpression(
-            ShapedQueryExpression shapedQueryExpression, LambdaExpression lambdaExpression, bool condition)
+            ShapedQueryExpression shapedQueryExpression, LambdaExpression lambdaExpression)
         {
             var parameterBindings = new Dictionary<Expression, Expression>
             {
@@ -573,7 +543,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
 
             var lambdaBody = new ReplacingExpressionVisitor(parameterBindings).Visit(lambdaExpression.Body);
 
-            return TranslateExpression((SelectExpression)shapedQueryExpression.QueryExpression, lambdaBody, condition);
+            return TranslateExpression((SelectExpression)shapedQueryExpression.QueryExpression, lambdaBody);
         }
 
         private ShapedQueryExpression AggregateResultShaper(

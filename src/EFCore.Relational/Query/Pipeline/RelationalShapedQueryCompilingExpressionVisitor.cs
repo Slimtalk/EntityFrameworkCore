@@ -35,8 +35,6 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline
             var shaperLambda = InjectEntityMaterializer(shapedQueryExpression.ShaperExpression);
             var selectExpression = (SelectExpression)shapedQueryExpression.QueryExpression;
 
-            selectExpression.ApplyProjection();
-
             var newBody = new RelationalProjectionBindingRemovingExpressionVisitor(selectExpression)
                 .Visit(shaperLambda.Body);
 

@@ -29,25 +29,25 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MethodInfo method, IList<SqlExpression> arguments)
         {
-            if (Equals(method.OnInterface(typeof(IPolygon)), _getInteriorRingN))
-            {
-                return new SqlFunctionExpression(
-                    "InteriorRingN",
-                    new SqlExpression[] {
-                        instance,
-                        _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                            new SqlBinaryExpression(
-                                ExpressionType.Add,
-                                arguments[0],
-                                new SqlConstantExpression(Expression.Constant(1), null),
-                                typeof(int),
-                                null),
-                            _typeMappingSource.FindMapping(typeof(int)))
-                    },
-                    method.ReturnType,
-                    _typeMappingSource.FindMapping(method.ReturnType),
-                    false);
-            }
+            //if (Equals(method.OnInterface(typeof(IPolygon)), _getInteriorRingN))
+            //{
+            //    return new SqlFunctionExpression(
+            //        "InteriorRingN",
+            //        new SqlExpression[] {
+            //            instance,
+            //            _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //                new SqlBinaryExpression(
+            //                    ExpressionType.Add,
+            //                    arguments[0],
+            //                    new SqlConstantExpression(Expression.Constant(1), null),
+            //                    typeof(int),
+            //                    null),
+            //                _typeMappingSource.FindMapping(typeof(int)))
+            //        },
+            //        method.ReturnType,
+            //        _typeMappingSource.FindMapping(method.ReturnType),
+            //        false);
+            //}
 
             return null;
         }

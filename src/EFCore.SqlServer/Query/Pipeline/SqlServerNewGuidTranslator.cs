@@ -22,14 +22,15 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MethodInfo method, IList<SqlExpression> arguments)
         {
-            return _methodInfo.Equals(method)
-                ? new SqlFunctionExpression(
-                    "NEWID",
-                    null,
-                    method.ReturnType,
-                    _typeMappingSource.FindMapping(method.ReturnType),
-                    false)
-                : null;
+            return null;
+            //return _methodInfo.Equals(method)
+            //    ? new SqlFunctionExpression(
+            //        "NEWID",
+            //        null,
+            //        method.ReturnType,
+            //        _typeMappingSource.FindMapping(method.ReturnType),
+            //        false)
+            //    : null;
         }
     }
 }

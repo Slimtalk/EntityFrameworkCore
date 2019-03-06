@@ -29,22 +29,22 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
         {
             if (Equals(method.OnInterface(typeof(IGeometryCollection)), _item))
             {
-                return new SqlFunctionExpression(
-                    "GeometryN",
-                    new SqlExpression[] {
-                        instance,
-                        _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                            new SqlBinaryExpression(
-                                ExpressionType.Add,
-                                arguments[0],
-                                new SqlConstantExpression(Expression.Constant(1), null),
-                                typeof(int),
-                                null),
-                            _typeMappingSource.FindMapping(typeof(int)))
-                    },
-                    method.ReturnType,
-                    _typeMappingSource.FindMapping(method.ReturnType),
-                    false);
+                //return new SqlFunctionExpression(
+                //    "GeometryN",
+                //    new SqlExpression[] {
+                //        instance,
+                //        _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+                //            new SqlBinaryExpression(
+                //                ExpressionType.Add,
+                //                arguments[0],
+                //                new SqlConstantExpression(Expression.Constant(1), null),
+                //                typeof(int),
+                //                null),
+                //            _typeMappingSource.FindMapping(typeof(int)))
+                //    },
+                //    method.ReturnType,
+                //    _typeMappingSource.FindMapping(method.ReturnType),
+                //    false);
             }
 
             return null;

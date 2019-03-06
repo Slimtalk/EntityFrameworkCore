@@ -61,80 +61,80 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MethodInfo method, IList<SqlExpression> arguments)
         {
-            method = method.OnInterface(typeof(IGeometry));
-            if (_methodToFunctionName.TryGetValue(method, out var functionName))
-            {
-                instance = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                    instance, _typeMappingSource.FindMapping(instance.Type));
+            //method = method.OnInterface(typeof(IGeometry));
+            //if (_methodToFunctionName.TryGetValue(method, out var functionName))
+            //{
+            //    instance = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //        instance, _typeMappingSource.FindMapping(instance.Type));
 
-                SqlExpression translation = new SqlFunctionExpression(
-                    functionName,
-                    new[] { instance }.Concat(
-                        arguments.Select(e => _typeMappingApplyingExpressionVisitor
-                            .ApplyTypeMapping(e, _typeMappingSource.FindMapping(e.Type)))),
-                    method.ReturnType,
-                    _typeMappingSource.FindMapping(method.ReturnType),
-                    false);
+            //    SqlExpression translation = new SqlFunctionExpression(
+            //        functionName,
+            //        new[] { instance }.Concat(
+            //            arguments.Select(e => _typeMappingApplyingExpressionVisitor
+            //                .ApplyTypeMapping(e, _typeMappingSource.FindMapping(e.Type)))),
+            //        method.ReturnType,
+            //        _typeMappingSource.FindMapping(method.ReturnType),
+            //        false);
 
-                if (method.ReturnType == typeof(bool))
-                {
-                    translation = new CaseExpression(
-                        new[]
-                        {
-                            new CaseWhenClause(
-                                new SqlNullExpression(instance, true, _typeMappingSource.FindMapping(typeof(bool))),
-                                translation)
-                        },
-                        null);
-                }
+            //    if (method.ReturnType == typeof(bool))
+            //    {
+            //        translation = new CaseExpression(
+            //            new[]
+            //            {
+            //                new CaseWhenClause(
+            //                    new SqlNullExpression(instance, true, _typeMappingSource.FindMapping(typeof(bool))),
+            //                    translation)
+            //            },
+            //            null);
+            //    }
 
-                return translation;
-            }
+            //    return translation;
+            //}
 
-            if (Equals(method, _getGeometryN))
-            {
-                instance = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                    instance, _typeMappingSource.FindMapping(instance.Type));
+            //if (Equals(method, _getGeometryN))
+            //{
+            //    instance = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //        instance, _typeMappingSource.FindMapping(instance.Type));
 
-                return new SqlFunctionExpression(
-                    "GeometryN",
-                    new[] {
-                        instance,
-                        _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                            new SqlBinaryExpression(
-                                ExpressionType.Add,
-                                arguments[0],
-                                new SqlConstantExpression(Expression.Constant(1), null),
-                                typeof(int),
-                                null),
-                            _typeMappingSource.FindMapping(typeof(int)))
-                    },
-                    method.ReturnType,
-                    _typeMappingSource.FindMapping(method.ReturnType),
-                    false);
-            }
+            //    return new SqlFunctionExpression(
+            //        "GeometryN",
+            //        new[] {
+            //            instance,
+            //            _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //                new SqlBinaryExpression(
+            //                    ExpressionType.Add,
+            //                    arguments[0],
+            //                    new SqlConstantExpression(Expression.Constant(1), null),
+            //                    typeof(int),
+            //                    null),
+            //                _typeMappingSource.FindMapping(typeof(int)))
+            //        },
+            //        method.ReturnType,
+            //        _typeMappingSource.FindMapping(method.ReturnType),
+            //        false);
+            //}
 
-            if (Equals(method, _isWithinDistance))
-            {
-                instance = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                    instance, _typeMappingSource.FindMapping(instance.Type));
+            //if (Equals(method, _isWithinDistance))
+            //{
+            //    instance = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //        instance, _typeMappingSource.FindMapping(instance.Type));
 
-                var updatedArguments = arguments.Select(e => _typeMappingApplyingExpressionVisitor
-                            .ApplyTypeMapping(e, _typeMappingSource.FindMapping(e.Type)))
-                            .ToList();
+            //    var updatedArguments = arguments.Select(e => _typeMappingApplyingExpressionVisitor
+            //                .ApplyTypeMapping(e, _typeMappingSource.FindMapping(e.Type)))
+            //                .ToList();
 
-                return new SqlBinaryExpression(
-                    ExpressionType.LessThanOrEqual,
-                    new SqlFunctionExpression(
-                        "Distance",
-                        new[] { instance, updatedArguments[0] },
-                        typeof(double),
-                        _typeMappingSource.FindMapping(typeof(double)),
-                        false),
-                    updatedArguments[1],
-                    typeof(bool),
-                    _typeMappingSource.FindMapping(typeof(bool)));
-            }
+            //    return new SqlBinaryExpression(
+            //        ExpressionType.LessThanOrEqual,
+            //        new SqlFunctionExpression(
+            //            "Distance",
+            //            new[] { instance, updatedArguments[0] },
+            //            typeof(double),
+            //            _typeMappingSource.FindMapping(typeof(double)),
+            //            false),
+            //        updatedArguments[1],
+            //        typeof(bool),
+            //        _typeMappingSource.FindMapping(typeof(bool)));
+            //}
 
             return null;
         }

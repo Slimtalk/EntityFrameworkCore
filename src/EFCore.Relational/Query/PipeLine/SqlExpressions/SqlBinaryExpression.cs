@@ -45,29 +45,13 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
             SqlExpression right,
             Type type,
             RelationalTypeMapping typeMapping)
-            : base(type, typeMapping, IsConditionFromOperator(VerifyOperator(operatorType)), !IsConditionFromOperator(operatorType))
+            : base(type, typeMapping)
         {
             Check.NotNull(left, nameof(left));
             Check.NotNull(right, nameof(right));
 
-            OperatorType = operatorType;
+            OperatorType = VerifyOperator(operatorType);
 
-            var conditionArgument = operatorType == ExpressionType.AndAlso || operatorType == ExpressionType.OrElse;
-
-            Left = left.ConvertToValue(!conditionArgument);
-            Right = right.ConvertToValue(!conditionArgument);
-        }
-
-        private SqlBinaryExpression(
-            ExpressionType operatorType,
-            SqlExpression left,
-            SqlExpression right,
-            Type type,
-            RelationalTypeMapping typeMapping,
-            bool treatAsValue)
-            : base(type, typeMapping, IsConditionFromOperator(operatorType), treatAsValue)
-        {
-            OperatorType = operatorType;
             Left = left;
             Right = right;
         }
@@ -78,7 +62,7 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
             var right = (SqlExpression)visitor.Visit(Right);
 
             return left != Left || right != Right
-                ? new SqlBinaryExpression(OperatorType, left, right, Type, TypeMapping, ShouldBeValue)
+                ? new SqlBinaryExpression(OperatorType, left, right, Type, TypeMapping)
                 : this;
         }
 
@@ -100,11 +84,6 @@ namespace Microsoft.EntityFrameworkCore.Relational.Query.Pipeline.SqlExpressions
                 ? operatorType
                 : throw new InvalidOperationException("Unsupported Binary operator type specified.");
 
-        }
-
-        public override SqlExpression ConvertToValue(bool treatAsValue)
-        {
-            return new SqlBinaryExpression(OperatorType, Left, Right, Type, TypeMapping, treatAsValue);
         }
 
         public ExpressionType OperatorType { get; }

@@ -49,23 +49,23 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
                 amountToAdd = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
                     amountToAdd, _typeMappingSource.FindMapping(typeof(int)));
 
-                return !datePart.Equals("year")
-                       && !datePart.Equals("month")
-                       && amountToAdd is SqlConstantExpression sqlConstant
-                       && ((double)sqlConstant.Value >= int.MaxValue
-                           || (double)sqlConstant.Value <= int.MinValue)
-                    ? null
-                    : new SqlFunctionExpression(
-                        "DATEADD",
-                        new[]
-                        {
-                            new SqlFragmentExpression(datePart),
-                            amountToAdd,
-                            instance
-                        },
-                        instance.Type,
-                        instance.TypeMapping,
-                        false);
+                //return !datePart.Equals("year")
+                //       && !datePart.Equals("month")
+                //       && amountToAdd is SqlConstantExpression sqlConstant
+                //       && ((double)sqlConstant.Value >= int.MaxValue
+                //           || (double)sqlConstant.Value <= int.MinValue)
+                //    ? null
+                //    : new SqlFunctionExpression(
+                //        "DATEADD",
+                //        new[]
+                //        {
+                //            new SqlFragmentExpression(datePart),
+                //            amountToAdd,
+                //            instance
+                //        },
+                //        instance.Type,
+                //        instance.TypeMapping,
+                //        false);
             }
 
             return null;

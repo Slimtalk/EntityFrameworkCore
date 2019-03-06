@@ -200,8 +200,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
                     FunctionName,
                     arguments,
                     MethodInfo.ReturnType,
-                    null,
-                    false);
+                    null);
         }
     }
 }

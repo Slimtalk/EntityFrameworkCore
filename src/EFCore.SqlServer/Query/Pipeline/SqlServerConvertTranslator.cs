@@ -57,19 +57,20 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MethodInfo method, IList<SqlExpression> arguments)
         {
-            return _supportedMethods.Contains(method)
-                ? new SqlFunctionExpression(
-                    "CONVERT",
-                    new[]
-                    {
-                        new SqlFragmentExpression(_typeMapping[method.Name]),
-                        _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                            arguments[0], _typeMappingSource.FindMapping(arguments[0].Type))
-                    },
-                    method.ReturnType,
-                    _typeMappingSource.FindMapping(method.ReturnType),
-                    false)
-                : null;
+            return null;
+            //return _supportedMethods.Contains(method)
+            //    ? new SqlFunctionExpression(
+            //        "CONVERT",
+            //        new[]
+            //        {
+            //            new SqlFragmentExpression(_typeMapping[method.Name]),
+            //            _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //                arguments[0], _typeMappingSource.FindMapping(arguments[0].Type))
+            //        },
+            //        method.ReturnType,
+            //        _typeMappingSource.FindMapping(method.ReturnType),
+            //        false)
+            //    : null;
         }
     }
 }

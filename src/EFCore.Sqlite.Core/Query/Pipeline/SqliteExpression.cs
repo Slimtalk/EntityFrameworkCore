@@ -47,8 +47,7 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
                         timestring
                 }.Concat(modifiers),
                 returnType,
-                typeMapping,
-                false);
+                typeMapping);
         }
     }
 }

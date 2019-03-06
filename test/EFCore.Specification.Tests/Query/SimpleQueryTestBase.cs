@@ -3812,7 +3812,7 @@ namespace Microsoft.EntityFrameworkCore.Query
             }
         }
 
-        [ConditionalFact(Skip = "TaskItem#4")]
+        [ConditionalFact]
         public virtual void Select_bitwise_and_or()
         {
             using (var context = CreateContext())
@@ -3829,7 +3829,7 @@ namespace Microsoft.EntityFrameworkCore.Query
             }
         }
 
-        [ConditionalTheory(Skip = "TaskItem#4")]
+        [ConditionalTheory]
         [MemberData(nameof(IsAsyncData))]
         public virtual Task Where_bitwise_or_with_logical_or(bool isAsync)
         {
@@ -3840,7 +3840,7 @@ namespace Microsoft.EntityFrameworkCore.Query
                 entryCount: 3);
         }
 
-        [ConditionalTheory(Skip = "TaskItem#4")]
+        [ConditionalTheory]
         [MemberData(nameof(IsAsyncData))]
         public virtual Task Where_bitwise_and_with_logical_and(bool isAsync)
         {
@@ -3850,7 +3850,7 @@ namespace Microsoft.EntityFrameworkCore.Query
                     cs.Where(c => c.CustomerID == "ALFKI" & c.CustomerID == "ANATR" && c.CustomerID == "ANTON"));
         }
 
-        [ConditionalTheory(Skip = "TaskItem#4")]
+        [ConditionalTheory]
         [MemberData(nameof(IsAsyncData))]
         public virtual Task Where_bitwise_or_with_logical_and(bool isAsync)
         {
@@ -3861,7 +3861,7 @@ namespace Microsoft.EntityFrameworkCore.Query
                 entryCount: 1);
         }
 
-        [ConditionalTheory(Skip = "TaskItem#4")]
+        [ConditionalTheory]
         [MemberData(nameof(IsAsyncData))]
         public virtual Task Where_bitwise_and_with_logical_or(bool isAsync)
         {
@@ -3872,7 +3872,7 @@ namespace Microsoft.EntityFrameworkCore.Query
                 entryCount: 1);
         }
 
-        [ConditionalTheory(Skip = "TaskItem#4")]
+        [ConditionalTheory]
         public virtual void Select_bitwise_or_with_logical_or()
         {
             using (var context = CreateContext())
@@ -3889,7 +3889,7 @@ namespace Microsoft.EntityFrameworkCore.Query
             }
         }
 
-        [ConditionalTheory(Skip = "TaskItem#4")]
+        [ConditionalTheory]
         public virtual void Select_bitwise_and_with_logical_and()
         {
             using (var context = CreateContext())

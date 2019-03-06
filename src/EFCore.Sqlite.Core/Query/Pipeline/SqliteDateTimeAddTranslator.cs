@@ -47,60 +47,60 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
         public SqlExpression Translate(SqlExpression instance, MethodInfo method, IList<SqlExpression> arguments)
         {
             SqlExpression modifier = null;
-            if (_addMilliseconds.Equals(method))
-            {
-                var argument = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(arguments[0], _doubleTypeMapping);
+            //if (_addMilliseconds.Equals(method))
+            //{
+            //    var argument = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(arguments[0], _doubleTypeMapping);
 
-                modifier = new SqlBinaryExpression(
-                    ExpressionType.Add,
-                    new SqlCastExpression(
-                        new SqlBinaryExpression(
-                            ExpressionType.Divide,
-                            argument,
-                            new SqlConstantExpression(Expression.Constant(1000), _typeMappingSource.FindMapping(typeof(int))),
-                            typeof(double),
-                            _doubleTypeMapping),
-                        typeof(string),
-                        _stringTypeMapping),
-                    new SqlConstantExpression(Expression.Constant(" seconds"), _stringTypeMapping),
-                    typeof(string),
-                    _stringTypeMapping);
-            }
-            else if (_addTicks.Equals(method))
-            {
-                var argument = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                    arguments[0], _typeMappingSource.FindMapping(arguments[0].Type));
+            //    modifier = new SqlBinaryExpression(
+            //        ExpressionType.Add,
+            //        new SqlUnaryExpression(
+            //            new SqlBinaryExpression(
+            //                ExpressionType.Divide,
+            //                argument,
+            //                new SqlConstantExpression(Expression.Constant(1000), _typeMappingSource.FindMapping(typeof(int))),
+            //                typeof(double),
+            //                _doubleTypeMapping),
+            //            typeof(string),
+            //            _stringTypeMapping),
+            //        new SqlConstantExpression(Expression.Constant(" seconds"), _stringTypeMapping),
+            //        typeof(string),
+            //        _stringTypeMapping);
+            //}
+            //else if (_addTicks.Equals(method))
+            //{
+            //    var argument = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //        arguments[0], _typeMappingSource.FindMapping(arguments[0].Type));
 
-                modifier = new SqlBinaryExpression(
-                    ExpressionType.Add,
-                    new SqlCastExpression(
-                        new SqlBinaryExpression(
-                            ExpressionType.Divide,
-                            argument,
-                            new SqlConstantExpression(Expression.Constant((double)TimeSpan.TicksPerDay), _doubleTypeMapping),
-                            typeof(double),
-                            _doubleTypeMapping),
-                        typeof(string),
-                        _stringTypeMapping),
-                    new SqlConstantExpression(Expression.Constant(" seconds"), _stringTypeMapping),
-                    typeof(string),
-                    _stringTypeMapping);
-            }
-            else if (_methodInfoToUnitSuffix.TryGetValue(method, out var unitSuffix))
-            {
-                var argument = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                    arguments[0], _typeMappingSource.FindMapping(arguments[0].Type));
+            //    modifier = new SqlBinaryExpression(
+            //        ExpressionType.Add,
+            //        new SqlUnaryExpression(
+            //            new SqlBinaryExpression(
+            //                ExpressionType.Divide,
+            //                argument,
+            //                new SqlConstantExpression(Expression.Constant((double)TimeSpan.TicksPerDay), _doubleTypeMapping),
+            //                typeof(double),
+            //                _doubleTypeMapping),
+            //            typeof(string),
+            //            _stringTypeMapping),
+            //        new SqlConstantExpression(Expression.Constant(" seconds"), _stringTypeMapping),
+            //        typeof(string),
+            //        _stringTypeMapping);
+            //}
+            //else if (_methodInfoToUnitSuffix.TryGetValue(method, out var unitSuffix))
+            //{
+            //    var argument = _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //        arguments[0], _typeMappingSource.FindMapping(arguments[0].Type));
 
-                modifier = new SqlBinaryExpression(
-                    ExpressionType.Add,
-                    new SqlCastExpression(
-                        argument,
-                        typeof(string),
-                        _stringTypeMapping),
-                    new SqlConstantExpression(Expression.Constant(unitSuffix), _stringTypeMapping),
-                    typeof(string),
-                    _stringTypeMapping);
-            }
+            //    modifier = new SqlBinaryExpression(
+            //        ExpressionType.Add,
+            //        new SqlUnaryExpression(
+            //            argument,
+            //            typeof(string),
+            //            _stringTypeMapping),
+            //        new SqlConstantExpression(Expression.Constant(unitSuffix), _stringTypeMapping),
+            //        typeof(string),
+            //        _stringTypeMapping);
+            //}
 
             if (modifier != null)
             {
@@ -124,13 +124,11 @@ namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Pipeline
                                 CreateStringConstant("0")
                             },
                             method.ReturnType,
-                            typeMapping,
-                            false),
+                            typeMapping),
                         CreateStringConstant(".")
                     },
                     method.ReturnType,
-                    typeMapping,
-                    false);
+                    typeMapping);
             }
 
             return null;

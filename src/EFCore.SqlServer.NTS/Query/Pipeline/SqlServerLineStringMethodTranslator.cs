@@ -28,28 +28,28 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Pipeline
 
         public SqlExpression Translate(SqlExpression instance, MethodInfo method, IList<SqlExpression> arguments)
         {
-            if (typeof(ILineString).IsAssignableFrom(method.DeclaringType))
-            {
-                if (Equals(method.OnInterface(typeof(ILineString)), _getPointN))
-                {
-                    return new SqlFunctionExpression(
-                        instance,
-                        "STPointN",
-                        new[] {
-                            _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
-                                new SqlBinaryExpression(
-                                    ExpressionType.Add,
-                                    arguments[0],
-                                    new SqlConstantExpression(Expression.Constant(1), null),
-                                    typeof(int),
-                                    null),
-                                _typeMappingSource.FindMapping(typeof(int)))
-                        },
-                        method.ReturnType,
-                        _typeMappingSource.FindMapping(method.ReturnType, instance.TypeMapping.StoreType),
-                        false);
-                }
-            }
+            //if (typeof(ILineString).IsAssignableFrom(method.DeclaringType))
+            //{
+            //    if (Equals(method.OnInterface(typeof(ILineString)), _getPointN))
+            //    {
+            //        return new SqlFunctionExpression(
+            //            instance,
+            //            "STPointN",
+            //            new[] {
+            //                _typeMappingApplyingExpressionVisitor.ApplyTypeMapping(
+            //                    new SqlBinaryExpression(
+            //                        ExpressionType.Add,
+            //                        arguments[0],
+            //                        new SqlConstantExpression(Expression.Constant(1), null),
+            //                        typeof(int),
+            //                        null),
+            //                    _typeMappingSource.FindMapping(typeof(int)))
+            //            },
+            //            method.ReturnType,
+            //            _typeMappingSource.FindMapping(method.ReturnType, instance.TypeMapping.StoreType),
+            //            false);
+            //    }
+            //}
 
             return null;
         }
